@@ -10,28 +10,25 @@ sub tick(@tape, Int $pc --> Int) {
     my @modes = @instruction[*-7..*-4].reverse;
 
     sub param(Int $pos) {
-        return get-param($pc + 1 + $pos, @modes[$pos], @tape);
+        get-param($pc + 1 + $pos, @modes[$pos], @tape);
     }
 
     sub immdt(Int $pos) {
-        return get-param($pc + 1 + $pos, 1, @tape);
+        get-param($pc + 1 + $pos, 1, @tape);
     }
 
     if $opcode == 1 {
-        my $sum = param(0) + param(1);
-        @tape[immdt(2)] = $sum;
+        @tape[immdt(2)] = param(0) + param(1);
         return 4;
     }
 
     if $opcode == 2 {
-        my $sum = param(0) * param(1);
-        @tape[immdt(2)] = $sum;
+        @tape[immdt(2)] = param(0) * param(1);
         return 4;
     }
 
     if $opcode == 3 {
-        my $input = prompt "INPUT: ";
-        @tape[immdt(0)] = $input;
+        @tape[immdt(0)] = prompt "INPUT: ";
         return 2;
     }
 
@@ -71,6 +68,6 @@ sub tick(@tape, Int $pc --> Int) {
     die;
 }
 
-@tape = slurp('5.txt').comb(/"-"?<digit>+/);
+my @tape = slurp('5.txt').comb(/"-"?<digit>+/);
 my $pc = 0;
-($pc += tick(@tape, $pc)) while (@tape[$pc] != 99);
+$pc += tick(@tape, $pc) while (@tape[$pc] != 99);
