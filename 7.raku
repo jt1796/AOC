@@ -16,13 +16,13 @@ sub update-max($cand) {
 
 sub compute-amp(@nums) {
     return start {
-        Promise.in(1).then({ die; });
         my Channel $last = input-of([0]);
-        {
+
+        await @nums.map({
             my Channel $input = input-of([$_, $last.receive]);
             $last = Channel.new;
-            IntCode.new(progtext => slurp('7.txt'), input => $input, output => $last).exec();
-        } for @nums;
+            IntCode.new(progtext => slurp('7.txt'), input => $input, output => $last).exec-async();
+        });
 
         my $val = $last.receive;
 

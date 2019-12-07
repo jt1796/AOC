@@ -75,6 +75,12 @@ class IntCode is export {
         die;
     }
 
+    method exec-async() {
+        start {
+            self.exec();
+        }
+    }
+
     method exec() {
         my @tape = $!progtext.comb(/"-"?<digit>+/);
         my $pc = 0;
