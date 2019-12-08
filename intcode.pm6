@@ -4,6 +4,7 @@ class IntCode is export {
     has Str $.progtext is required;
     has Channel $.input is required;
     has Channel $.output is required;
+    has $.final-val is rw;
 
     method get-param($at, $mode, @tape) {
         my $raw = @tape[$at];
@@ -40,6 +41,7 @@ class IntCode is export {
         }
 
         if $opcode == 4 {
+            $.final-val = @tape[immdt(0)];
             $.output.send(@tape[immdt(0)]);
             return 2;
         }
@@ -78,6 +80,7 @@ class IntCode is export {
     method exec-async() {
         start {
             self.exec();
+            self;
         }
     }
 
