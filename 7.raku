@@ -26,7 +26,7 @@ sub compute-amp(@nums) {
 }
 
 sub solve() {
-    compute-amp($_) for (0, 1, 2, 3, 4).permutations;
+    compute-amp($_) for (5, 6, 7, 8, 9).permutations;
 }
 
 solve();
