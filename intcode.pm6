@@ -5,11 +5,13 @@ class IntCode is export {
     has Channel $.input is required;
     has Channel $.output is required;
     has $.final-val is rw;
+    has Int $.relative-base is rw = 0;
 
     method get-param($at, $mode, @tape) {
         my $raw = @tape[$at];
         return @tape[$raw] if $mode == 0;
         return $raw if $mode == 1;
+        return @tape[$raw + self.relative-base] if $mode == 2;
     }
 
     method tick(@tape, Int $pc --> Int) {
@@ -22,7 +24,9 @@ class IntCode is export {
         }
 
         sub immdt(Int $pos) {
-            self.get-param($pc + 1 + $pos, 1, @tape);
+            my $offset = 0;
+            $offset = self.relative-base if @modes[$pos] == 2;
+            $offset + self.get-param($pc + 1 + $pos, 1, @tape);
         }
 
         if $opcode == 1 {
@@ -36,13 +40,13 @@ class IntCode is export {
         }
 
         if $opcode == 3 {
-            @tape[immdt(0)] = $.input.receive;
+            @tape[immdt(0)] = self.input.receive;
             return 2;
         }
 
         if $opcode == 4 {
-            $.final-val = @tape[immdt(0)];
-            $.output.send(@tape[immdt(0)]);
+            $.final-val = param(0);
+            $.output.send(param(0));
             return 2;
         }
 
@@ -74,6 +78,11 @@ class IntCode is export {
             return 4;
         }
 
+        if $opcode == 9 {
+            self.relative-base += param(0);
+            return 2;
+        }
+
         die;
     }
 
@@ -85,7 +94,7 @@ class IntCode is export {
     }
 
     method exec() {
-        my @tape = $!progtext.comb(/"-"?<digit>+/);
+        my @tape is default(0) = $!progtext.comb(/"-"?<digit>+/);
         my $pc = 0;
         $pc += self.tick(@tape, $pc) while (@tape[$pc] != 99);
     }
