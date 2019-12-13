@@ -94,7 +94,7 @@ class IntCode is export {
     }
 
     method exec() {
-        my @tape is default(0) = $!progtext.comb(/"-"?<digit>+/);
+        my @tape is default(0) = $!progtext.comb(/"-"?<digit>+/).map: +*;
         my $pc = 0;
         $pc += self.tick(@tape, $pc) while (@tape[$pc] != 99);
     }
