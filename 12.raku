@@ -1,36 +1,29 @@
-# possible idea. The moons are not identical. Loop until each initial moon configuration 
-# corresponds to a moon, even if not the same moon. You now know how many loops it takes to
-# "reorder" the moons. You can now replay the permutation until you arrive back at the initial state.
+my @moons = slurp('12.txt').comb(/"-"?\d+/).batch(3);
+my @initials = slurp('12.txt').comb(/"-"?\d+/).batch(3);
+my @velocities = @moons.map({ 0, 0, 0 });
 
-my @moons;
-my @initials;
-my @velocities;
+sub infix:<$^>(@a, @b) {
+    (@b Z[-] @a).map: *.sign;
+}
 
-sub setup() {
-    @moons = slurp('12.txt').comb(/"-"?\d+/).Array.rotor(3);
-    @initials = slurp('12.txt').comb(/"-"?\d+/).rotor(3);
-    @velocities = @moons.map({ [0, 0, 0] });
+sub infix:<$+>(@a, @b) {
+    @a Z[+] @b;
 }
 
 sub loop() {
-    for ^@moons.elems -> $inner {
-        for ^@moons.elems -> $outer {
-            for ^@moons[0].elems -> $coord {
-                @velocities[$inner][$coord] -= (@moons[$inner][$coord]  -  @moons[$outer][$coord]).sign;
-            }
-        }
-    }
-
-    for ^@moons.elems -> $moon-index {
-        for ^@moons[0].elems -> $coord {
-            @moons[$moon-index][$coord] += @velocities[$moon-index][$coord];
-        }
-    }
+    my @diffs = (@moons X$^ @moons).batch(@moons.elems).map({[$+] $_ });
+    @velocities = @velocities Z$+ @diffs;
+    @moons = @moons Z$+ @velocities;
 }
 
+sub energy(@a) {
+    [+] @a.map: *.abs;
+}
+
+# loop() for ^10;
+# say [+] ((@moons Z @velocities).map({ energy($_[0]) * energy($_[1]) }));
 
 sub loops-till-initial() {
-    setup();
     my $loop-ctr = 1;
 
     my $xend = Nil;
@@ -48,5 +41,3 @@ sub loops-till-initial() {
 }
 
 say [lcm] loops-till-initial();
-
-# 1575501928 too low
