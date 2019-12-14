@@ -1,40 +1,19 @@
 my @reactions = slurp('14.txt').lines.map({ m:g/\w+/.map({ .Str }) });
+my %needs is default(0) = 'FUEL' => 1;
 
-sub reaction-applies(@reaction, %stuff) {
-    !@reaction[0..*-3].rotor(2).first({ %stuff{ $_[1] } < $_[0] } );
+sub apply-reaction($need) {
+    my @reaction = @reactions.first({ $_[* - 1] eq $need }).rotor(2);
+    %needs{$_[1]} += $_[0] for @reaction;
+    %needs{ $need } -= 2 * @reaction[* - 1][0];
 }
 
-sub apply-reaction(@reaction, %stuff) {
-    my %newstuff is default(0) = %stuff.clone;
-    %newstuff{$_[1]} -= $_[0] for @reaction.rotor(2);
-    %newstuff{ @reaction[* - 1] } += 2 * @reaction[* - 2];
-    %newstuff;
+sub get-next-need() {
+    %needs.keys.first({ $_ !eq 'ORE' and  %needs{ $_ } > 0 });
 }
 
-my %visited is default(0);
-
-# additional param. "blacklisted reactions" and "current reaction". 
-sub leads-to-fuel(%stuff, @usedrxns) {
-    return True if %stuff{ 'FUEL' } > 0;
-    return False if %visited{ item %stuff } > 0;
-    %visited{ item %stuff } = 1;
-
-    for @reactions -> @reaction {
-        next if @usedrxns.contains(@reaction);
-        my %newstuff is default(0) = %stuff.clone;
-        while (reaction-applies(@reaction, %newstuff)) {
-            %newstuff = apply-reaction(@reaction, %newstuff);
-            return True if leads-to-fuel(%newstuff, [@reaction, |@usedrxns]);
-        }
-    }
-
-    return False;
+while (get-next-need()) {
+    apply-reaction(get-next-need());
 }
 
-sub try-with-ore($ore) {
-    my %stuff is default(0) = 'ORE' => $ore;
-    leads-to-fuel(%stuff, []);
-}
-
-say try-with-ore(13312);
-
+say %needs;
+say %needs<ORE>
