@@ -20,4 +20,21 @@ sub tell-ores($fuel) {
     %needs<ORE>;
 }
 
-say tell-ores(1);
+sub binsearch($min, $max) {
+    if (($min - $max).abs <= 1) {
+        return ($min, $max);
+    }
+    my $target = (($min + $max) / 2).floor;
+    say "trying $target";
+    if (tell-ores($target) <= 1000000000000) {
+        binsearch($target, $max);
+    } else {
+        return binsearch($min, $target);
+    }
+}
+
+say binsearch(0, 10000000);
+say tell-ores(1670299);
+say tell-ores(1670300);
+
+# 1670300 too high
