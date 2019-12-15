@@ -76,16 +76,28 @@ sub find-oxygen($x, $y, $steps) {
 
 find-oxygen(0, 0, 0);
 say @oxygen; #14, 20;
+%grid{ item @oxygen } = 'O';
 
 for (0..50) -> $y {
     for (0..50) -> $x {
-        if ([0, 0] eq [$x - 25, $y - 25]) {
-            print("X");
-        } elsif (@oxygen eq [$x - 25, $y - 25]) {
-            print("O");
-        } else {
-            print(%grid{ item [$x - 25, $y - 25] });
-        }
+        print(%grid{ item [$x - 25, $y - 25] });
     }
     "".say;
 }
+
+sub adjacent(@point) {
+    ((1, 0), (0, 1), (-1, 0), (0, -1)).map({ (@point Z+ $_) });
+}
+
+say adjacent([3, 4]);
+
+my $minutes = 0;
+my @frontier = [@oxygen,];
+while (@frontier.elems > 0) {
+    my @adjacents = @frontier.map({ adjacent($_).Slip }).grep({ %grid{ item $_ } eq ' ' });
+    %grid{ item $_ } = 'O' for @adjacents;
+    @frontier = @adjacents;
+    $minutes++;
+}
+
+$minutes.say;
