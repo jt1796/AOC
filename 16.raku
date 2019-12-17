@@ -1,3 +1,5 @@
+use experimental :cached;
+
 sub pattern($n) {
     (0 xx $n, 1 xx $n, 0 xx $n, -1 xx $n).flat.List.rotate(1);
 }
@@ -7,13 +9,13 @@ sub infix:<@+%>(@a, @b) {
 }
 
 sub FFT(@nums) {
-    "fft".say;
+    DateTime.now.say;
     (^@nums.elems).map({ @nums @+% pattern($_ + 1) });
 }
 
-my @nums = slurp('16.txt').comb(/\d/);
-
+# 2500 ? 
+my $multiple = 10;
+my @nums = (slurp('16.txt') x $multiple).comb(/\d/);
 @nums = FFT(@nums) for ^100;
 
 say @nums;
-say @nums[0..7].join;
