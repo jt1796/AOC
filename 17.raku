@@ -6,41 +6,18 @@ my $output = Channel.new;
 my $machine = IntCode.new(progtext => slurp('17.txt'), input => $input, output => $output);
 my $prom = $machine.exec-async();
 
-my @grid[;];
+my @grid;
 
 sub receive($x, $y) {
-    my $token = $output.receive;
-    if $token == 35 {
-        @grid[$y][$x] = '#';
-        return receive($x + 1, $y);
-    } 
-    if $token == 46 {
-        @grid[$y][$x] = '.';
-        return receive($x + 1, $y);
-    }
-    if $token == 94 {
-        @grid[$y][$x] = '^';
-        return receive($x + 1, $y);
-    }
-    if $token == 60 {
-        @grid[$y][$x] = '<';
-        return receive($x + 1, $y);
-    }
-    if $token == 62 {
-        @grid[$y][$x] = '>';
-        return receive($x + 1, $y);
-    }
-    if $token == 76 {
-        @grid[$y][$x] = 'v';
-        return receive($x + 1, $y);
-    }
-    if $token == 10 {
+    my $token = $output.receive.chr;
+    if $token eq "\n" {
         if $x == 0 {
             return;
         }
         return receive(0, $y + 1);
     }
-    $token.say;
+    @grid[$y][$x] = $token;
+    return receive($x + 1, $y);
 }
 
 receive(0, 0);
@@ -56,7 +33,7 @@ sub isintersection(@coords) {
 }
 
 sub isinland(@coords) {
-    (0 < @coords[1] < @grid.elems) and (0 < @coords[0] < @grid[0].elems);
+    (0 < @coords[1] < @grid.elems - 1) and (0 < @coords[0] < @grid[0].elems - 1);
 }
 
 sub ispath(@coords) {
@@ -67,7 +44,10 @@ sub alignment(@coords) {
     [*] @coords;
 }
 
-my @intersections = (^@grid[0].elems X ^@grid.elems).grep(&ispath).grep(&isintersection);
+say @grid[0].elems;
+
+my @intersections = (^@grid[0].elems X ^@grid.elems)
+        .grep(&ispath)
+        .grep(&isintersection);
 @intersections.say;
 say [+] @intersections.map(&alignment);
-#638 too low
