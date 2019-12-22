@@ -1,21 +1,22 @@
-use experimental :cached;
-
-sub pattern($n) {
-    (0 xx $n, 1 xx $n, 0 xx $n, -1 xx $n).flat.List.rotate(1);
+sub round(@nums) {
+    my @copy;
+    my $sum = 0;
+    for ^(@nums.elems) -> $idx {
+        $sum += @nums[$idx];
+        @copy[$idx] = $sum % 10;
+    }
+    @copy;
 }
 
-sub infix:<@+%>(@a, @b) {
-    $_.abs % 10 with [+] (^@a.elems).map({ @a[$_] * @b[$_ % *] });
-}
+round([5, 3, 6, 7]).say;
 
-sub FFT(@nums) {
-    DateTime.now.say;
-    (^@nums.elems).map({ @nums @+% pattern($_ + 1) });
-}
+my $multiple = 10000;
+my @nums = (slurp('16.txt') x $multiple).comb();
 
-# 2500 ? 
-my $multiple = 10;
-my @nums = (slurp('16.txt') x $multiple).comb(/\d/);
-@nums = FFT(@nums) for ^100;
+my $where = @nums[0..6].join;
+$where.say;
+@nums = @nums[$where..*].reverse;
 
-say @nums;
+@nums = round(@nums) for ^100;
+say @nums.reverse[0..100];
+
