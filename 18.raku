@@ -26,13 +26,15 @@ sub adjacents([$x, $y]) {
 
 my %distmap;
 my %blockmap is default(List.new);
+my %keysalongpath is default(List.new);
 
 sub gen-key-dist() {
     my @keysandstart = ('@', @keytexts).flat;
     my %locations = @keysandstart.map({ $_ => key-location-of($_) });
 
     for @keysandstart -> $key {
-        my @frontier = ((%locations{ $key }.Slip, 0, List.new),);
+        my @frontier = ((%locations{ $key }.Slip, 0, List.new, Array.new),);
+
         my %seen is default(False);
 
         while @frontier.elems > 0 {
@@ -40,6 +42,7 @@ sub gen-key-dist() {
             my $expand = $next[0..1];
             my $steps = $next[2];
             my @doors = $next[3].clone;
+            my @pickedupkeys = $next[4].clone;
             my $marker = @input[$expand[1]][$expand[0]];
 
             next if $marker eq '#';
@@ -48,11 +51,13 @@ sub gen-key-dist() {
             if (m/<lower>/ with $marker) {
                 %distmap{ item [$key, $marker] } = $steps;
                 %blockmap{ item [$key, $marker] } = @doors;
+                @pickedupkeys.push($marker);
+                %keysalongpath{ item [$key, $marker] } = @pickedupkeys;
             }
             if (m/<upper>/ with $marker) {
                 @doors.push($marker.lc);
             }
-            @frontier.push(item [$_.Slip, $steps + 1, @doors]) for adjacents($expand);
+            @frontier.push(item [$_.Slip, $steps + 1, @doors, @pickedupkeys]) for adjacents($expand);
         }
     }
 }
@@ -61,10 +66,12 @@ gen-key-dist();
 
 %distmap.say;
 %blockmap.say;
+%keysalongpath.say;
 
 my %cache is default(False);
 my $bestdist = -Inf;
 my $frontier = PriorityQueue.new(:cmp( { $^a[1] <= $^b[1] } ));
+
 
 $frontier.push(item ('@', 0, List.new));
 while $frontier.shift -> $removed {
@@ -87,11 +94,13 @@ while $frontier.shift -> $removed {
 
     my @options = (@keytexts (-) @keys (-) $symbol).keys
                     .grep({ defined %distmap{ item [$symbol, $_] } })
-                    .grep({ so %blockmap{ item [$symbol, $_] }.all ∈ @keys });
+                    .grep({ so %blockmap{ item [$symbol, $_] }.all ∈ @keys })
+                    .map({ %keysalongpath{ item [$symbol, $_] }.first({ $_ ∉ @keys }) })
+                    .unique;
 
     for @options -> $option {
-        my @newkeys = @keys.clone.Slip, $option;
+        my @newkeys = (@keys.clone.Slip, $option).unique;
         my $newdistance = $distance + %distmap{ item [$symbol, $option] };
-        $frontier.push( item [$option, $newdistance, @newkeys]);
+        $frontier.push( item [$option, $newdistance, @newkeys.unique]);
     }
 }
