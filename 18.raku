@@ -69,38 +69,39 @@ gen-key-dist();
 %keysalongpath.say;
 
 my %cache is default(False);
-my $bestdist = -Inf;
-my $frontier = PriorityQueue.new(:cmp( { $^a[1] <= $^b[1] } ));
+my $bestdist = Inf;
+my @frontier = List.new;
 
+"starting".say;
 
-$frontier.push(item ('@', 0, List.new));
-while $frontier.shift -> $removed {
+@frontier.push(item ('@', 0, List.new));
+while @frontier.pop -> $removed {
     my $symbol = $removed[0];
     my $distance = $removed[1];
     my @keys = $removed[2].List;
-    next if %cache{ item [$symbol, @keys.Bag] };
-    %cache{ item [$symbol, @keys.Bag] } = True;
+    next if %cache{ item [$symbol, @keys.Set] };
+    %cache{ item [$symbol, @keys.Set] } = True;
 
-    if @keys.elems == $keycount {
-        @keys.say;
-        $distance.say;
-        die;
+    if $distance >= $bestdist {
+        next;
     }
 
-    if $bestdist != $distance {
+    if @keys.elems == $keycount {
+        $bestdist = min($bestdist, $distance);
+        @keys.say;
         $distance.say;
-        $bestdist = $distance;
     }
 
     my @options = (@keytexts (-) @keys (-) $symbol).keys
                     .grep({ defined %distmap{ item [$symbol, $_] } })
                     .grep({ so %blockmap{ item [$symbol, $_] }.all ∈ @keys })
                     .map({ %keysalongpath{ item [$symbol, $_] }.first({ $_ ∉ @keys }) })
+                    .sort({ -%distmap{ item [$symbol, $_] } })
                     .unique;
 
     for @options -> $option {
         my @newkeys = (@keys.clone.Slip, $option).unique;
         my $newdistance = $distance + %distmap{ item [$symbol, $option] };
-        $frontier.push( item [$option, $newdistance, @newkeys.unique]);
+        @frontier.push( item [$option, $newdistance, @newkeys]);
     }
 }
