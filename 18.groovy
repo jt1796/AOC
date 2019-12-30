@@ -1,32 +1,33 @@
-input = new File('18.txt').readLines().collect({ it.getChars() });
-($startx, $starty) = keylocationof('@');
-keytexts = input.flatten().findAll( { it.isLowerCase() } );
-keycount = keytexts.size();
+def solve() {
+    def input = new File('18.txt').readLines().collect({ it.getChars() });
 
-def keylocationof(key) {
-    def starty = input.findIndexOf({ it.contains(key) });
-    def startx = input[starty].findIndexOf({ it == key });
-    return [startx, starty];
-}
+    def keylocationof = { key ->
+        def starty = input.findIndexOf({ it.contains(key) });
+        def startx = input[starty].findIndexOf({ it == key });
+        return [startx, starty];
+    }
 
-def inbounds(x, y) {
-    0 <= y && y <= input.size() && 0 <= x && x <= input[0].size();
-}
+    def inbounds = { x, y ->
+        0 <= y && y <= input.size() && 0 <= x && x <= input[0].size();
+    }
 
-def adjacents(x, y) {
-    return [
-        [x, y + 1],
-        [x, y - 1],
-        [x - 1, y],
-        [x + 1, y]
-    ].findAll({ inbounds(it) });
-}
+    def adjacents = { x, y ->
+        return [
+            [x, y + 1],
+            [x, y - 1],
+            [x - 1, y],
+            [x + 1, y]
+        ].findAll({ inbounds(it) });
+    }
 
-distmap = [:];
-blockmap = [:].withDefault({ [] });
-keysalongpath = [:].withDefault({ [] });
+    def ($startx, $starty) = keylocationof('@');
+    def keytexts = input.flatten().findAll( { it.isLowerCase() } );
+    def keycount = keytexts.size();
 
-def genkeydist() {
+    def distmap = [:];
+    def blockmap = [:].withDefault({ [] });
+    def keysalongpath = [:].withDefault({ [] });
+
     def keysandstart = ['@', keytexts].flatten();
     def locations = keysandstart.collectEntries({ return [it, keylocationof(it)] });
 
@@ -64,52 +65,50 @@ def genkeydist() {
             }
         }
     }
+
+    def cache = [:].withDefault({ false });
+    def bestdist = 9999999999;
+    def frontier = new PriorityQueue({ a, b -> a[1] - b[1] });
+
+    println "starting";
+
+    frontier.add(['@', 0, []]);
+    while (frontier.size() > 0) {
+        removed = frontier.remove();
+        def symbol = removed[0];
+        def distance = removed[1];
+        def keys = removed[2];
+        if (cache[[symbol, keys.toSet()]]) {
+            continue;
+        }
+        cache[[symbol, keys.toSet()]] = true;
+
+        if (distance >= bestdist) {
+            continue;
+        }
+
+        if (keys.size() == keycount) {
+            bestdist = Math.min(bestdist, distance);
+            println keys;
+            println distance;
+        }
+
+
+        def options = (keytexts - keys - [symbol])
+                        .findAll({ null != distmap[[symbol, it]] })
+                        .findAll({ blockmap[[symbol, it]].every({ keys.contains(it) }) })
+                        .collect({ keysalongpath[[symbol, it]].find({ !keys.contains(it) }) })
+                        .sort({ -1 * distmap[[symbol, it]] })
+                        .unique();
+
+        for (option in options) {
+            def newkeys = [keys.collect(), option].flatten().unique();
+            def newdistance = distance + distmap[[symbol, option]];
+            frontier.add([option, newdistance, newkeys]);
+        }
+    }
+
+    return bestdist;
 }
 
-genkeydist();
-
-distmap.say;
-blockmap.say;
-keysalongpath.say;
-
-cache = [:].withDefault({ false });
-bestdist = 9999999999;
-frontier = new PriorityQueue({ a, b -> a[1] - b[1] });
-
-println "starting";
-
-frontier.add(['@', 0, []]);
-while (frontier.size() > 0) {
-    removed = frontier.remove();
-    def symbol = removed[0];
-    def distance = removed[1];
-    def keys = removed[2];
-    if (cache[[symbol, keys.toSet()]]) {
-        continue;
-    }
-    cache[[symbol, keys.toSet()]] = true;
-
-    if (distance >= bestdist) {
-        continue;
-    }
-
-    if (keys.size() == keycount) {
-        bestdist = Math.min(bestdist, distance);
-        println keys;
-        println distance;
-    }
-
-
-    def options = (keytexts - keys - [symbol])
-                    .findAll({ null != distmap[[symbol, it]] })
-                    .findAll({ blockmap[[symbol, it]].every({ keys.contains(it) }) })
-                    .collect({ keysalongpath[[symbol, it]].find({ !keys.contains(it) }) })
-                    .sort({ -1 * distmap[[symbol, it]] })
-                    .unique();
-
-    for (option in options) {
-        def newkeys = [keys.collect(), option].flatten().unique();
-        def newdistance = distance + distmap[[symbol, option]];
-        frontier.add([option, newdistance, newkeys]);
-    }
-}
+println solve();
