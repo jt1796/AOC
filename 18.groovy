@@ -1,5 +1,6 @@
-def solve() {
-    def input = new File('18.txt').readLines().collect({ it.getChars() });
+def solve(xbounds, ybounds) {
+    def input = new File('18.txt').readLines()[ybounds].collect({ it.getChars()[xbounds] });
+    //input.forEach({ println it });
 
     def keylocationof = { key ->
         def starty = input.findIndexOf({ it.contains(key) });
@@ -20,7 +21,6 @@ def solve() {
         ].findAll({ inbounds(it) });
     }
 
-    def ($startx, $starty) = keylocationof('@');
     def keytexts = input.flatten().findAll( { it.isLowerCase() } );
     def keycount = keytexts.size();
 
@@ -28,7 +28,7 @@ def solve() {
     def blockmap = [:].withDefault({ [] });
     def keysalongpath = [:].withDefault({ [] });
 
-    def keysandstart = ['@', keytexts].flatten();
+    def keysandstart = ['@' as char, keytexts].flatten();
     def locations = keysandstart.collectEntries({ return [it, keylocationof(it)] });
 
     for (key in keysandstart) {
@@ -57,7 +57,7 @@ def solve() {
                 pickedupkeys.push(marker);
                 keysalongpath[[key, marker]] = pickedupkeys;
             }
-            if (marker.isUpperCase()) {
+            if (marker.isUpperCase() && keytexts.contains(marker.toLowerCase())) {
                 doors.push(marker.toLowerCase());
             }
             for (adjacent in adjacents(expand)) {
@@ -66,13 +66,16 @@ def solve() {
         }
     }
 
+    // println distmap;
+    // println blockmap;
+
     def cache = [:].withDefault({ false });
     def bestdist = 9999999999;
     def frontier = new PriorityQueue({ a, b -> a[1] - b[1] });
 
     println "starting";
 
-    frontier.add(['@', 0, []]);
+    frontier.add(['@' as char, 0, []]);
     while (frontier.size() > 0) {
         removed = frontier.remove();
         def symbol = removed[0];
@@ -111,4 +114,9 @@ def solve() {
     return bestdist;
 }
 
-println solve();
+println([
+    solve(40..80, 40..80),
+    solve(0..40, 0..40),
+    solve(40..80, 0..40),
+    solve(0..40, 40..80),
+].sum());
