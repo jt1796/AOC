@@ -54,48 +54,76 @@ def getneighbors(x, y) {
     }
     if (getAt([x, y]).isLetter()) {
         def tag = portals[[x, y]];
-        def commonLocations = portals.keySet().findAll({ portals[it] == tag });
+        def commonLocations = portals.keySet().findAll({ portals[it] == tag && it != [x, y] });
         def neighbors = []
         commonLocations.forEach({ neighbors.addAll(getDirectNeighbors(*it)) });
-        return neighbors
+        return neighbors.findAll({ getAt(it) == '.' })
     }
+}
+
+def isouter(loc) {
+    def x = loc[0]
+    def y = loc[1]
+    return y == 1 || y == (input.size() - 2) || x == 1 || x == (input[0].size() - 2)
 }
 
 println portals;
 locationAA = portals.keySet().find({ portals[it] == 'AA' })
 frontier = new PriorityQueue({ a, b -> a[1] - b[1] })
-frontier.add([locationAA, -1])
+frontier.add([up(locationAA), -1, 0, []])
 seen = [:]
 
 while (frontier.size() > 0) {
     def removed = frontier.remove()
     def location = removed[0]
     def steps = removed[1]
+    def level = removed[2]
+    def path = removed[3]
     
-    if (seen[location] || (getAt(location) == '#')) {
+    if (seen[location, level] || (getAt(location) == '#') || level < 0) {
         continue
     } else {
-        seen[location] = true
+        seen[location, level] = true
     }
 
-    if (portals[location] == 'ZZ') {
+    if (portals[location] == 'ZZ' && (level == 0)) {
         println steps
+        println level
+        println path
+        println path.size()
         System.exit(0)
     }
 
+    def islevel = 0
+    def isstep = 1
+    if (portals[location]) {
+        isstep = 0
+        if (level == 0 && isouter(location) && portals[location] != 'AA') {
+            continue
+        }
+        if (level > 0 && (portals[location] == 'ZZ' || portals[location] == 'AA')) {
+            continue
+        }
+        if (isouter(location)) {
+            islevel--;
+        } else {
+            islevel++;
+        }
+    }
 
     def neighbors = getneighbors(*location)
-    println "steps"
-    println steps
-    def isstep = 1
-    if (getAt(location).isLetter()) {
-        isstep = 0
+    def newpath = path.collect()
+    if (portals[location]) {
+        newpath.push(portals[location])
+        newpath.push(level + islevel)
     }
+
     for (neighbor in neighbors) {
-        frontier.add([neighbor, steps + isstep])
+        frontier.add([neighbor, steps + isstep, level + islevel, newpath])
     }
 }
 
 
 
-// 560 too high
+
+// method for "inner" or "outer" level
