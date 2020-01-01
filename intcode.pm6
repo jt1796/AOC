@@ -4,7 +4,9 @@ class IntCode is export {
     has Str $.progtext is required;
     has Channel $.input is required;
     has Channel $.output is required;
+    has Bool $.readblock = True;
     has $.final-val is rw;
+    has Int $!idle-ctr = 0;
     has Int $.relative-base is rw = 0;
 
     method get-param($at, $mode, @tape) {
@@ -40,11 +42,19 @@ class IntCode is export {
         }
 
         if $opcode == 3 {
-            @tape[immdt(0)] = self.input.receive;
+            $!idle-ctr++;
+            sleep 10 if self.is-idle();
+            if self.readblock {
+                @tape[immdt(0)] = self.input.receive;
+            } else {
+                my $polled = self.input.poll;
+                @tape[immdt(0)] = $polled.defined ?? $polled !! -1;
+            }
             return 2;
         }
 
         if $opcode == 4 {
+            $!idle-ctr = 0;
             $.final-val = param(0);
             $.output.send(param(0));
             return 2;
@@ -83,6 +93,9 @@ class IntCode is export {
             return 2;
         }
 
+        "shouldnt have gone here $opcode".say;
+
+
         die;
     }
 
@@ -98,6 +111,21 @@ class IntCode is export {
         my $pc = 0;
         $pc += self.tick(@tape, $pc) while (@tape[$pc] != 99);
     }
+
+    method is-idle() {
+        $!idle-ctr > 100 and channel-is-empty(self.input);
+    }
+}
+
+sub channel-is-empty($chan) {
+    my $elem = $chan.poll;
+    my @elems;
+    while $elem.defined() {
+        @elems.push($elem);
+        $elem = $chan.poll;
+    }
+    $chan.send($_) for @elems;
+    return @elems.elems == 0;
 }
 
 sub input-of(@vals) is export {
