@@ -1,22 +1,22 @@
 decksize = 10007 as BigInteger
-position = 2019
+position = 3377 as BigInteger
 
-// 3377
+// 2019 expected. What number is in that position?
 
 def newstack() {
     position = decksize - position - 1 
 }
 
-def deal(int n) {
-    position = ((n * position) % decksize)
+def deal(BigInteger n) {
+    position = ((n.modInverse(decksize) * position) % decksize)
 }
 
 def cut(int n) {
-    position = (position - n + decksize) % decksize
+    position = (position + n + decksize) % decksize
 }
 
 moves = new File('22.txt').readLines().collect{ it.split(' ') }
-for (move in moves) {
+for (move in moves.reverse()) {
     if (move == ['deal', 'into', 'new', 'stack']) {
         newstack()
     }
