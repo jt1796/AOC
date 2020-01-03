@@ -13,6 +13,24 @@ sub get-word() {
     return $msg;
 }
 
+=begin comment
+    OR I T
+    AND I T
+    AND E T
+    OR H T
+    AND T J
+
+    OR A T
+    AND A T
+    OR B T
+    OR C T
+    NOT T T
+    OR T J
+=end comment
+
+
+
+
 my $instructions = qq:to/END/;
     NOT A J
     NOT B T
@@ -20,12 +38,17 @@ my $instructions = qq:to/END/;
     NOT C T
     OR T J
     AND D J
+    OR I T
+    AND I T
+    AND E T
+    OR H T
+    AND T J
+    NOT A T
+    OR T J
     END
 
 get-word().say; # Input instructions: 
 $input.send($_) for $instructions.ords;
-$input.send($_) for "WALK\n".ords;
-get-word().say;
-get-word().say;
-get-word().say;
+$input.send($_) for "RUN\n".ords;
 $output.receive.say for ^Inf;
+get-word().say for ^Inf;
