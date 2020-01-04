@@ -6,7 +6,7 @@ def deal(BigInteger n) {
     position = ((n.modInverse(decksize) * position) % decksize)
 }
 
-def cut(int n) {
+def cut(BigInteger n) {
     position = (position + n + decksize) % decksize
 }
 
@@ -14,10 +14,10 @@ moves = new File('22.txt').readLines().collect{ it.split(' ') }
 def shuffle() {
     for (move in moves.reverse()) {
         if (move.size() > 2 && move[0..2] == ['deal', 'with', 'increment']) {
-            deal(move[3].toInteger())
+            deal(move[3].toBigInteger())
         }
         if (move[0] == 'cut') {
-            cut(move[1].toInteger())
+            cut(move[1].toBigInteger())
         }
     }
 }
