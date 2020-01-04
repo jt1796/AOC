@@ -10,21 +10,33 @@ def add(BigInteger n) {
     position = (position + n + decksize) % decksize
 }
 
-moves = new File('22.txt').readLines().collect{ it.split(' ') }
-def shuffle() {
-    for (move in moves.reverse()) {
-        if (move[0] == 'multiply') {
-            multiply(move[1].toBigInteger())
-        }
-        if (move[0] == 'add') {
-            add(move[1].toBigInteger())
-        }
+//           multiply                      add
+primitive = [70684449757251 as BigInteger, 53942452021304 as BigInteger]
+
+def shuffle(formula) {
+    add(formula[1])
+    multiply(formula[0])
+}
+
+def shuffleN(n) {
+    n.times {
+        shuffle(primitive)
     }
 }
     
-shuffle()
+shuffleN(16)
 println position
-shuffle()
-println position
-shuffle()
+
+position = initialposition
+
+// use formula to get to 97 shuffles
+def squareformula(formula) {
+    return [formula[0] * formula[0], formula[1] + formula[0] * formula[1]]
+}
+
+def formula = primitive
+4.times {
+    formula = squareformula(formula)
+}
+shuffle(formula)
 println position
