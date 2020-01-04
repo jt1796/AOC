@@ -24,25 +24,27 @@ def shuffleN(n) {
     }
 }
     
-shuffleN(97)
+shuffleN(2000)
 println position
 position = initialposition
 
 // use formula to get to 97 shuffles
 def doubleformula(formula) {
-    return [formula[0] * formula[0], formula[1] + formula[0] * formula[1]]
+    return [formula[0] * formula[0] % decksize, formula[1] + formula[0] * formula[1] % decksize]
 }
 
-def mults = 97
+def mults = 101741582076661 as BigInteger
 while (mults > 0) {
     int log = Math.log(mults) / Math.log(2)
     System.out.println(log)
     mults -= Math.pow(2, log)
+    System.out.println(mults == 31372837898997)
 
     def formula = primitive
     log.times {
         formula = doubleformula(formula)
     }
+    println "here"
     shuffle(formula)
 }
 
