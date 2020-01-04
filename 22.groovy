@@ -24,19 +24,26 @@ def shuffleN(n) {
     }
 }
     
-shuffleN(16)
+shuffleN(97)
 println position
-
 position = initialposition
 
 // use formula to get to 97 shuffles
-def squareformula(formula) {
+def doubleformula(formula) {
     return [formula[0] * formula[0], formula[1] + formula[0] * formula[1]]
 }
 
-def formula = primitive
-4.times {
-    formula = squareformula(formula)
+def mults = 97
+while (mults > 0) {
+    int log = Math.log(mults) / Math.log(2)
+    System.out.println(log)
+    mults -= Math.pow(2, log)
+
+    def formula = primitive
+    log.times {
+        formula = doubleformula(formula)
+    }
+    shuffle(formula)
 }
-shuffle(formula)
+
 println position
