@@ -1,5 +1,5 @@
 # 9588/2425/744
 # manually "squashed" my input into this equivalent form. 
 # shuffle is just cut -1, followed by deal -1. deal is just multiplication, and cut is addition
-deal with increment 70684449757251
-cut 53942452021304
+multiply 70684449757251
+add 53942452021304
