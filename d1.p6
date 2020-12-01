@@ -1,0 +1,1 @@
+say [*] ([X] open("d1.input").lines xx 3).grep(*.sum == 2020)[0];
