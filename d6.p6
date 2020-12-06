@@ -1,0 +1,1 @@
+say sum open('d6.txt').split(/\n\n/).map({ .elems with [∩] ($_.lines.map: *.comb) });
