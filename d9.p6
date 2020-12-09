@@ -4,10 +4,10 @@ my $num = 15353384;
 
 (^@input).map({
     my $start = $_;
-    INNER: for ($start^...^@input) {
-        my $sum = @input[$start...$_].sum;
+    INNER: for ($start^..^@input.elems) -> $end {
+        my $sum = @input[$start..$end].sum;
         if $num == $sum {
-            say @input[$start...$_].min + @input[$start...$_].max;
+            say @input[$start...$end].min + @input[$start...$end].max;
             die;
         };
 
