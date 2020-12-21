@@ -1,31 +1,22 @@
 sub eval($evalexpr) {
-    my $input = $evalexpr.flip;
-
-    s:g/\s// with $input;
-    s:g/\d+/{$/.flip}/ with $input;
-    s:g/\)/\%/ with $input;
-    s:g/\(/\)/ with $input;
-    s:g/\%/\(/ with $input;
+    my $input = S:g/\s// with $evalexpr;
 
     grammar Calculator {
         token TOP { <expr> }
         token num { \d+ }
-        token binop { '+' | '*' }
-        token expr { [<expr1> <binop> <expr>] | [<expr1>] }
-        token expr1 { ['(' <expr> ')'] | [<num>] }
+        token expr { <term> ['*' <term>]* }
+        token term { <factor> ['+' <factor>]* }
+        token factor { [<num>] | ['(' <expr> ')'] }
     }
 
     class Compute {
         method TOP($/) { make $<expr>.made }
-        method expr($/) {
-            make $<binop>
-            ?? ($<binop>.Str eq '+') ?? ($<expr1>.made + $<expr>.made) !! ($<expr1>.made * $<expr>.made)
-            !! $<expr1>.made
-        }
-        method expr1($/) { make $<num> ?? $<num>.Str !! $<expr>.made }
+        method expr($/) { make [*] $<term>.map: *.made }
+        method term($/) { make [+] $<factor>.map: *.made }
+        method factor($/) { make $<num> ?? $<num>.Str !! $<expr>.made }
     }
 
-    return Calculator.parse($input, actions => Compute).made;
+    Calculator.parse($input, actions => Compute).made;
 }
 
 open('d18.txt').lines.map({ eval($_) }).sum.say;
