@@ -1,5 +1,4 @@
 my %book;
-
 my $ingredients = SetHash.new;
 my %counter is default(0);
 
@@ -29,5 +28,13 @@ for %book {
 
 my $invalids = $ingredients (-) %book.values.flat;
 
-say %counter;
-say $invalids.keys.map({ %counter{ $_ } }).sum;
+my @reals = gather while %book.elems {
+    my $victim = %book.first({ .value.elems == 1 });
+    take $victim.value[0], $victim.key;
+    %book{ $victim.key }:delete;
+    for %book {
+        %book{ .key } := .value.grep({ $_ ne $victim.value });
+    }
+}
+
+say @reals.sort({ .[1].Str }).map({ .[0] }).join(',');
