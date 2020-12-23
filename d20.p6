@@ -47,10 +47,14 @@ sub rights(@tile) {
     @tile.map({ .[* - 1] }).join('');
 }
 
+sub stripborder(@tile) {
+    @tile[1..*-2].map({ .[1..*-2] });
+}
+
 sub findsoln(%gridsofar, @used, $x, $y) {
     say ($x, $y);
     if $y == $dim {
-        return @used;
+        return %gridsofar;
     }
     return False if ($y, $x).any >= $dim;
     my @avail = .keys with $names (-) @used;
@@ -81,7 +85,67 @@ sub findsoln(%gridsofar, @used, $x, $y) {
     return False;   
 }
 
-my @soln := findsoln({}, (), 0, 0);
-say @soln;
-say @soln[0, $dim, * - $dim, *-1];
-say [*] @soln[0, $dim - 1, * - $dim, *-1];
+my %soln := findsoln({}, (), 0, 0);
+for %soln {
+    %soln{ .key } := stripborder(.value);
+}
+
+my $picdim = 8 * $dim;
+my @pic = .rotor($picdim) with gather for ^$dim -> $y {
+    for ^8 -> $innery {
+        for ^$dim -> $x {
+            for ^8 -> $innerx {
+                take %soln{ ($x, $y).Str }[$innery][$innerx];
+            }
+        }
+    }
+}
+
+sub monstercoords() {
+    (
+        (0,  0),
+        (1, -1),
+        (4, -1),
+        (5,  0),
+        (6,  0),
+        (7, -1),
+        (10, -1),
+        (11,  0),
+        (12, 0),
+        (13, -1),
+        (16, -1),
+        (17, 0),
+        (18, 0),
+        (18, 1),
+        (19, 0),
+    )
+}
+
+say monstercoords();
+
+my @arrangements := (|flip(@pic), |flip([Z] @pic));
+my $monsters = @arrangements.map(-> @arrangement {
+    my $monsters = 0;
+    for ^$picdim -> $x {
+        for ^$picdim -> $y {
+            my $possible = monstercoords()
+                .map( { $_ >>+<< ($x, $y) } )
+                .grep({ 0 <= .all < $picdim })
+                .map( { @arrangement[.[1]][.[0]] } )
+                .grep({ .all eq "#" })
+                .elems;
+            
+            if ($possible == monstercoords().elems) {
+                ($x, $y).say;
+                $monsters++;
+            }
+        }
+    }
+
+    say $monsters;
+    $monsters;
+}).max;
+
+say $monsters;
+my $hashes = .sum with gather @pic.deepmap({ take 1 if $_ eq '#' });
+say $hashes - $monsters*monstercoords().elems;
