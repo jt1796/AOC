@@ -2,8 +2,7 @@ my %files;
 my @dirs;
 
 for open('d7.txt').lines {
-    my $line =  $_;
-    given $line {
+    given $_ {
         when /\$\scd\s\// { @dirs = ('/') }
         when /\$\scd\s\.\./ { @dirs.pop }
         when /\$\scd\s(.*)/ { @dirs.push: $/[0] ~ '/' }
