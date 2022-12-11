@@ -21,8 +21,7 @@ for ^10000 {
         .<count> += @items;
 
         for @items -> $item {
-            my $to = (.<false>, .<true>)[$item %% .<test>];
-            @monkeys[$to].<items>.push($item);
+            @monkeys[.<false true>[$item %% .<test>]].<items>.push($item);
         }
     }
 }
