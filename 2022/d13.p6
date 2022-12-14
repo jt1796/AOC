@@ -8,11 +8,7 @@ sub soln($l, $r) {
         when Int, Int { $l <=> $r }
         when Int, Array { soln([$l,], $r) }
         when Array, Int { soln($l, [$r,]) }
-        when Array, Array { 
-            my $first = ($l.List Z[&soln] $r.List).first(* != Same);
-            return $first if $first ~~ Order;
-            return soln($l.elems, $r.elems);
-        }
+        when Array, Array { ($l.List Z[&soln] $r.List).first(* != Same) || soln($l.elems, $r.elems) }
     }
 }
 
