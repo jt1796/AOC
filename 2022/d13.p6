@@ -8,13 +8,11 @@ sub soln($l, $r) {
         return $l < $r if $l != $r;
         return Nil;
     }
-    if ($l | $r) ~~ Array {
-        return soln($l, [$r,]) if $r ~~ Int;
-        return soln([$l,], $r) if $l ~~ Int;
-        my $first = ($l.List Z[&soln] $r.List).first(* ~~ Bool);
-        return $first if $first ~~ Bool;
-        return soln($l.elems, $r.elems);
-    }
+    return soln($l, [$r,]) if $r ~~ Int;
+    return soln([$l,], $r) if $l ~~ Int;
+    my $first = ($l.List Z[&soln] $r.List).first(* ~~ Bool);
+    return $first if $first ~~ Bool;
+    return soln($l.elems, $r.elems);
 }
 
 say [*] @lines.sort(&soln).reverse.grep(* eq @markers.any, :k).map: * + 1;
