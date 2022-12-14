@@ -1,10 +1,23 @@
 use MONKEY-SEE-NO-EVAL;
 
-my @lists = open('d13.txt').split(/\n\n/)>>.lines.deepmap: *.subst("10", "'a'", :g).subst("[", "[0,", :g);
+my @markers = [[2],], [[6],];
+my @lines = |@markers, |open('d13.txt').lines.grep(*.chars)>>.subst(/<?after \]>\]/, ',]', :g)>>.&EVAL;
 
-say [+] 1..Inf Z* @lists.map({ [lt] $_>>.&EVAL });
+sub soln($l, $r) {
+    return $l ~~ Nil if ($l|$r) ~~ Nil;
+    if ($l & $r) ~~ Int {
+        return $l < $r if $l != $r;
+        return Nil;
+    }
+    if ($l|$r) ~~ Array {
+        my @l = ([$l,], $l)[$l ~~ Array].List;
+        my @r = ([$r,], $r)[$r ~~ Array].List;
+        my @res = @l Z[&soln] @r;
+        my $first = @res.first(* ~~ Bool);
+        return $first if $first ~~ Bool;
+        return Nil if @l.elems == @r.elems;
+        return @r.elems > @l.elems;
+    }
+}
 
-
-# 5594 too low
-# 6318 too high
-# 6006 too low
+say [*] @lines.sort(&soln).reverse.grep(* eq @markers.any, :k).map: * + 1;
