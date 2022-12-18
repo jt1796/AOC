@@ -8,7 +8,7 @@ my @corner = (@bounds>>.[0]);
 my @frontier = (@corner,);
 
 my %seen;
-sub bfs() {
+while @frontier {
     my @newfrontier = @frontier
         .map({ |(($_,*) «>>+<<» @nxbors) })
         .grep({ ! %seen{.Str} })
@@ -19,8 +19,6 @@ sub bfs() {
 
     @frontier = @newfrontier;
 }
-
-bfs() while @frontier;
 
 say @lines.map({
     (($_,*) «>>+<<» @nxbors).map({so %seen{.Str}}).sum;
