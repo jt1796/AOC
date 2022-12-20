@@ -1,3 +1,5 @@
+# see d19.js. This was too slow and had a bug in it that I cant be bothered
+
 my @blueprints = open('d19.txt').lines;
 
 say @blueprints.map({
