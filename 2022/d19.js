@@ -46,9 +46,11 @@ const scores = lines.map(line => {
 
     let max = 0;
 
+    const maxTime = 24;
+
     const solve = (time, have, rates) => {
         max = Math.max(max, have.geode);
-        if (time == 24) return have.geode;
+        if (time == maxTime) return have.geode;
 
         const cacheKey = JSON.stringify([have, rates]);
         if (!!cache[cacheKey] && time >= cache[cacheKey]) {
@@ -57,10 +59,14 @@ const scores = lines.map(line => {
             cache[cacheKey] = time;
         }
 
+        const maxOreNeeded = Math.max(oreForOre, oreForClay, oreForObsidian, oreForGeode);
+        const maxClayNeeded = clayForObsidian;
+        const maxObsidianNeeded = obsidianForGeode;
+
         const options = [];
-        if (oreForOre <= have.ore && [oreForOre, oreForClay, oreForObsidian, oreForGeode].some(o => o >= rates.ore)) options.push('ore');
-        if (oreForClay <= have.ore && [clayForObsidian].some(o => o >= rates.clay)) options.push('clay');
-        if (oreForObsidian <= have.ore && clayForObsidian <= have.clay && [obsidianForGeode].some(o => o >= rates.obsidian)) options.push('obsidian');
+        if (oreForOre <= have.ore && maxOreNeeded >= rates.ore) options.push('ore');
+        if (oreForClay <= have.ore && maxClayNeeded >= rates.clay) options.push('clay');
+        if (oreForObsidian <= have.ore && clayForObsidian <= have.clay && maxObsidianNeeded >= rates.obsidian) options.push('obsidian');
         if (oreForGeode <= have.ore && obsidianForGeode <= have.obsidian) options.push('geode');
 
         Object.keys(rates).forEach(gem => have[gem] += rates[gem]);
@@ -82,11 +88,16 @@ const scores = lines.map(line => {
             candidates.push(solve(time + 1, { ...have }, { ...rates }));
         }
 
+        const timeLeft = maxTime - time;
+        if (maxOreNeeded * timeLeft > have.ore) have.ore = maxOreNeeded * timeLeft;
+        if (maxClayNeeded * timeLeft > have.clay) have.clay = maxClayNeeded * timeLeft;
+        if (maxObsidianNeeded * timeLeft > have.obsidian) have.obsidian = maxObsidianNeeded * timeLeft;
+
         return Math.max(...candidates);
     };
     const answer = solve(0, { ...have }, { ...rates });
     console.log(id, ' ~ ', answer);
-    return answer;
+    return id * answer;
 });
 
 console.log(scores.reduce((a, b) => a + b));
