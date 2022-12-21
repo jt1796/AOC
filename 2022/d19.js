@@ -47,11 +47,13 @@ const scores = lines.map(line => {
         const maxClayNeeded = clayForObsidian;
         const maxObsidianNeeded = obsidianForGeode;
 
-        const options = [];
+        let options = [];
         if (oreForOre <= have.ore && maxOreNeeded >= rates.ore) options.push('ore');
         if (oreForClay <= have.ore && maxClayNeeded >= rates.clay) options.push('clay');
         if (oreForObsidian <= have.ore && clayForObsidian <= have.clay && maxObsidianNeeded >= rates.obsidian) options.push('obsidian');
         if (oreForGeode <= have.ore && obsidianForGeode <= have.obsidian) options.push('geode');
+
+        if (options.includes("geode")) options = ["geode"];
 
         Object.keys(rates).forEach(gem => have[gem] += rates[gem]);
 
