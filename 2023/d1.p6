@@ -5,4 +5,4 @@ say "d1.txt".IO.lines.map(-> $line {
     sub pairs(@list) { |.flat.rotor(2) with @list.map({ $line.indices($_) }) >>,>> ^Inf };
 
     pairs(@digits), pairs(@literals);
-}).map({ .min(:by(*[0]))[1] ~ .max(:by(:[0]))[1] }).sum;
+}).map({ .min(:by(*.first))[1] ~ .max(:by(*.first))[1] }).sum;
