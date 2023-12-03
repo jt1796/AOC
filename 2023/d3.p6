@@ -1,6 +1,5 @@
 my @input = "d3.txt".IO.lines>>.comb>>.List;
 
-my %hot;
 my %words;
 
 sub nearby($x, $y) {
@@ -12,9 +11,14 @@ for ^@input -> $y {
         my $word = .Int + ($y * 141 + .from + 1)i;
         %words{(($_, $y), )} = $word for .from ..^ .to;
     }
-    for ^@input[$y] -> $x {
-        %hot{nearby($x, $y)} = (1, 1 ... ∞) unless @input[$y][$x] ~~ /\d|\./;
-    }
 }
 
-(%hot <<*>> %words).values.unique>>.re.sum.say;
+@input.kv.map(-> $y, @row {
+    |@input[$y].kv.map(-> $x, $v {
+        if $v eq '*' {
+            my %nears = nearby($x, $y).map(* => 1);
+            my @parts = (%nears <<*>> %words).values.unique>>.re;
+            @parts.elems eq 2 ?? [*] @parts !! 0;
+        }
+    });
+}).sum.say;
