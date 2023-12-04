@@ -1,5 +1,10 @@
 my @input = "d4.txt".IO.lines.map({S/Card.*\://})>>.split("|")>>.comb(/\d+/)>>.map(*.Set);
 
-my @scores = 0, 1, 2, 4 ... *;
+my @scores = @input.map({ [∩] $_ }).map(*.elems);
+my $counts = @scores.map({ 1 }).Array;
 
-say @input.map({ [∩] $_ }).map({ @scores[$_] }).sum;
+for @scores.kv -> $i, $v {
+    $counts[$_] += $counts[$i] for $i ^.. $v+$i;
+}
+
+say $counts.sum;
