@@ -9,4 +9,8 @@ sub mkmapper(@lines) {
 
 my &composed = [∘] @maps>>.rotor(3).map({ mkmapper($_) }).reverse;
 
-$seeds.map(&composed).min.say;
+my $approx = $seeds.rotor(2)>>.Int.map({ .[0], .[0] + 1000 ... .[0] + .[1] }).flat.min(&composed, :k);
+
+my $exact = ($approx - 500 .. $approx + 500).list.min(&composed, :k);
+
+say &composed($exact);
