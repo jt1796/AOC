@@ -4,7 +4,7 @@ my $pq = PriorityQueue.new(:cmp(*[0]));
 my @input = "d10.txt".IO.lines>>.comb>>.Array.Array;
 
 sub findS() {
-    (0, .[0], .[1].first("S", :k)) with @input.first("S" (elem) *, :kv);
+    (.[0], .[1].first("S", :k)) with @input.first("S" (elem) *, :kv);
 }
 
 my %dirs := { U => (-1, 0), D => (1, 0), L => (0, -1), R => (0, 1) };
@@ -17,7 +17,7 @@ my %mmap := {
     'F' => %dirs<R D>,
     '.' => (),
     'S' => %dirs<U D L R>,
-     # 'S' => %dirs<U R>,
+     #'S' => %dirs<U R>,
 };
 
 $pq.push(findS());
@@ -25,16 +25,17 @@ $pq.push(findS());
 @input>>.join>>.say;
 
 my %seen;
-while $pq.shift -> ($d, $r, $c) {
-    my $sym = @input[$r][$c] || ".";
-    next if $sym eq '.' or %seen{$r ~ '_' ~ $c}:exists;
-    %seen{$r ~ '_' ~ $c} = $d;
+sub findLoop($dist, $r, $c) {
+    my $sym = @input[$r][$c] || '.';
+    return -1 if $sym eq '.';
+    return $dist if $sym eq 'S' and $dist > 0;
+    return -1 if %seen{ $r ~ '_' ~ $c }:exists;
 
-    $pq.push(($d + 1, .[0], .[1])) for (($r, $c), *) <<«+»>> %mmap{$sym};
+    %seen{ $r ~ '_' ~ $c } = True;
+    my $max = .map({ findLoop($dist + 1, .[0], .[1]) }).max with (($r, $c), *) <<«+»>> %mmap{$sym};
+    %seen{ $r ~ '_' ~ $c } = False;
+
+    return $max;
 }
 
-say %seen.values.max;
-
-# 6848 too low
-
-# DFS to do the full loop and wind back up at S
+say findLoop(0, |findS());
