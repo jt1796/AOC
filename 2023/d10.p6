@@ -16,26 +16,72 @@ my %mmap := {
     '7' => %dirs<L D>,
     'F' => %dirs<R D>,
     '.' => (),
-    'S' => %dirs<U D L R>,
-     #'S' => %dirs<U R>,
+    # 'S' => %dirs<D L>,
+    'S' => %dirs<U R>,
 };
 
 $pq.push(findS());
 
-@input>>.join>>.say;
-
 my %seen;
 sub findLoop($dist, $r, $c) {
     my $sym = @input[$r][$c] || '.';
-    return -1 if $sym eq '.';
-    return $dist if $sym eq 'S' and $dist > 0;
-    return -1 if %seen{ $r ~ '_' ~ $c }:exists;
+    return {} if $sym eq '.';
+    if $sym eq 'S' and $dist > 2 {
+        say 'max: ' ~ solve(%seen.clone).elems;
+        return %seen.clone;
+    }
+    return {} if %seen{ $r ~ '_' ~ $c }:exists;
 
     %seen{ $r ~ '_' ~ $c } = True;
-    my $max = .map({ findLoop($dist + 1, .[0], .[1]) }).max with (($r, $c), *) <<«+»>> %mmap{$sym};
-    %seen{ $r ~ '_' ~ $c } = False;
-
-    return $max;
+    findLoop($dist + 1, .[0], .[1]) for (($r, $c), *) <<«+»>> %mmap{$sym};
+    %seen{ $r ~ '_' ~ $c }:delete;
 }
 
-say findLoop(0, |findS());
+findLoop(0, |findS());
+
+sub solve(%mainloop) {
+    say 'mainloop size: ' ~ %mainloop.elems;
+    my %outside;
+    my %inside;
+    sub paintregion($r, $c) {
+        return if %inside{$r ~ '_' ~ $c}:exists or %outside{$r ~ '_' ~ $c}:exists or %mainloop{$r ~ '_' ~ $c}:exists;
+
+        my %painted;
+        sub paint($r, $c) {
+            my $str = $r ~ '_' ~ $c;
+            return if %mainloop{ $str }:exists;
+            return if %painted{ $str }:exists;
+            return unless @input[$r][$c];
+            %painted{ $str } = True;
+
+            paint(.[0], .[1]) for (($r, $c), *) <<«+»>> %dirs<U D L R>;
+        }
+
+        paint($r, $c);
+
+        my @ray = (.[0], .[0] + 1 ... .[0] + 1000) <<,>> .[1] with %painted.keys.first.split('_');
+        my $symbag = @ray.grep({ %mainloop{ .[0] ~ '_' ~ .[1] }:exists }).map({ @input[.[0]][.[1]] || '.' }).Bag;
+        my $crossings = $symbag{'-'};
+
+        $crossings += ($symbag{'7'} - $symbag{'J'} + $symbag{'L'} + $symbag{'S'} - $symbag{'F'}) / 2;
+
+        if not $crossings %% 2 {
+            %inside = (%inside >>or<< %painted);
+        } else {
+            %outside = (%outside >>or<< %painted);
+        }
+
+        say %inside.elems;
+    }
+
+
+    for @input.kv -> $r, @row {
+        for @row.kv -> $c, $sym {
+            paintregion($r, $c);
+        }
+    }
+
+    return %inside;
+}
+
+#468 too high
