@@ -16,6 +16,10 @@ my @work = (
     ((0, 0), @right, 3, -@grid[0][0])
 );
 
+# hill climbing? if we always choose the
+# need a function to score a position
+# score plus manhattan distance to exit?
+
 while @work.pop -> (@pos, @dir, $rem, $score) {;
     my $guess = (@pos[0] - +@grid).abs + (@pos[1] - +@grid[0]).abs;
     if $score + $guess >= $allbest or $rem < 0 or not defined @grid[@pos[0]][@pos[1]] {
@@ -23,7 +27,10 @@ while @work.pop -> (@pos, @dir, $rem, $score) {;
     }
 
     my $bnbkey = (@pos, @dir, $rem).join("_"); # and for any x <= $rem
-    if %bests{ $bnbkey }:exists and %bests{ $bnbkey } <= $score {
+    my $totalkey = (@pos, @dir, $rem, $score).join("_");
+    if %bests{$totalkey}:exists {
+        return %bests{$totalkey};
+    } elsif %bests{ $bnbkey }:exists and %bests{ $bnbkey } <= $score {
         next;
     } elsif %bests{ ~@pos }:exists and %bests{ ~@pos } <= $score - 36 {
         next;
