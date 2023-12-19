@@ -1,24 +1,48 @@
 my %dirs = 'U' => (-1, 0), 'D' => (1, 0), 'L' => (0, -1), 'R' => (0, 1);
 
-my @input = "d18.txt".IO.lines>>.split(' ');
+my @h;
+my @v;
 
-my @steps = @input.map({ .[0] xx .[1] }).flat.map({ %dirs{ $_ } });
+my @start = (0, 0);
+for "d18.txt".IO.lines>>.split(' ') -> ($dir, $mag, $rest) {
+    my @vector = %dirs{ $dir }.map(* * $mag);
+    my @end = @start Z+ @vector;
+    
+    @v.push((@start[1], |(@start[0], @end[0]).sort)) if $dir eq 'U'|'D';
+    @h.push((@start[0], |(@start[1], @end[1]).sort)) if $dir eq 'L'|'R';
 
-my %bounds = @steps.produce(-> @a, @b { @a >>+<< @b }).map(*.join("_") => True).Hash;
-
-my %outer;
-
-my $r = 405;
-
-sub bfs($x, $y) {
-    return unless -$r <= ($x,$y).all <= $r;
-    return if %outer{ ($x,$y).join("_") }:exists or %bounds{ ($x,$y).join("_") }:exists;
-
-    %outer{ ($x,$y).join("_") } = True;
-
-    bfs(.[0], .[1]) for %dirs.values.map({ $_ >>+<< ($x,$y) });
+    @start = @end;
 }
 
-bfs(-$r, -$r);
+@h = @h.sort();
+@v = @v.sort();
 
-say ((2 * $r + 1) ** 2) - %outer.elems;
+my %per;
+
+my $total = 0;
+for @h.rotor(2 => -1) X @v.rotor(2 => -1) -> (@hbox, @vbox) {
+    my $area = (@hbox[1][0] - @hbox[0][0] - 1) * (@vbox[1][0] - @vbox[0][0] - 1);
+    next if (@hbox[1][0] - @hbox[0][0] - 1) < 0 or (@vbox[1][0] - @vbox[0][0] - 1) < 0;
+
+    my $h = (@hbox[0][0] + @hbox[1][0]) / 2;
+    my $v = (@vbox[0][0] + @vbox[1][0]) / 2;
+
+    my $outside = @v.grep({ .[0] < $v }).grep({ .[1] <= $h <= .[2] }).elems %% 2;
+    next if $outside;
+
+    $total += $area;
+
+    %per{ (@hbox[0][0], @vbox[0][0], @vbox[1][0]).join('_') } = @vbox[1][0] - @vbox[0][0] - 1;
+    %per{ (@hbox[1][0], @vbox[0][0], @vbox[1][0]).join('_') } = @vbox[1][0] - @vbox[0][0] - 1;
+
+    %per{ (@vbox[0][0], @hbox[0][0], @hbox[1][0]).join('_') } = @hbox[1][0] - @hbox[0][0] - 1;
+    %per{ (@vbox[1][0], @hbox[0][0], @hbox[1][0]).join('_') } = @hbox[1][0] - @hbox[0][0] - 1;
+
+    %per{ (@hbox[0][0], @vbox[0][0]).join("_") } = 1;
+    %per{ (@hbox[1][0], @vbox[1][0]).join("_") } = 1;
+
+    %per{ (@hbox[0][0], @vbox[1][0]).join("_") } = 1;
+    %per{ (@hbox[1][0], @vbox[0][0]).join("_") } = 1;
+}
+
+say $total + %per.values.sum;
