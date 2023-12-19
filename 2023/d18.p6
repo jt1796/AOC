@@ -3,8 +3,12 @@ my %dirs = 'U' => (-1, 0), 'D' => (1, 0), 'L' => (0, -1), 'R' => (0, 1);
 my @h;
 my @v;
 
+sub parse($hex) {
+    (<R D L U>[+$hex.substr(7, 1)], :16($hex.substr(2, 5)), $hex);
+}
+
 my @start = (0, 0);
-for "d18.txt".IO.lines>>.split(' ') -> ($dir, $mag, $rest) {
+for "d18.txt".IO.lines>>.split(' ').map({ parse(.[2]) }) -> ($dir, $mag, $rest) {
     my @vector = %dirs{ $dir }.map(* * $mag);
     my @end = @start Z+ @vector;
     
@@ -43,6 +47,8 @@ for @h.rotor(2 => -1) X @v.rotor(2 => -1) -> (@hbox, @vbox) {
 
     %per{ (@hbox[0][0], @vbox[1][0]).join("_") } = 1;
     %per{ (@hbox[1][0], @vbox[0][0]).join("_") } = 1;
+
+    say $++;
 }
 
 say $total + %per.values.sum;
