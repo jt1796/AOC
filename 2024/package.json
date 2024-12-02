@@ -1,0 +1,18 @@
+{
+  "name": "2024",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "",
+  "main": "d1.js",
+  "scripts": {
+    "day1": "tsc --project tsconfig.json && node dist/d1.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "typescript": "^5.7.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1"
+  }
+}
