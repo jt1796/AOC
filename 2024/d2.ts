@@ -1,7 +1,7 @@
-import { range, zip } from "./common.js";
+import { zip } from "./common.js";
 
 const answer = "d2.txt".readNumsLines().map(line => {
-    return range(0, line.length - 1).some(pos => {
+    return line.range().some(pos => {
         const dropped = line.spliced(pos, 1);
 
         const pairs = zip(dropped, dropped.spliced(0, 1));

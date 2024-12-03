@@ -5,6 +5,7 @@ interface Array<T> {
     sortAsNums(): Array<T>;
     groupBy(keyfn: (t: T) => string): Record<string, T[]>;
     spliced(start: number, deleteCount = 0, ...toAdd: T[] = []): Array<T>;
+    range(): number[];
 }
 
 interface Object {

@@ -57,6 +57,9 @@ Object.prototype.mapValues = function (mapper) {
     Object.entries(this).forEach(([k, v]) => newObject[k] = mapper(v));
     return newObject;
 };
+Array.prototype.range = function () {
+    return range(0, this.length - 1);
+};
 export const zip = (listA, listB) => {
     const minLength = Math.min(listA.length, listB.length);
     const zipped = [];

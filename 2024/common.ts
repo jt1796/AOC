@@ -77,6 +77,10 @@ Object.prototype.mapValues = function<T, V>(mapper: (t: T) => V) {
     return newObject;
 }
 
+Array.prototype.range = function() {
+    return range(0, this.length - 1);
+}
+
 export const zip = <T, B>(listA: T[], listB: B[]) => {
     const minLength = Math.min(listA.length, listB.length);
     const zipped: [T, B][] = [];
