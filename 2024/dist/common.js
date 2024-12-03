@@ -12,11 +12,15 @@ Array.prototype.chunk = function (size, skip = 0, start = 0) {
     let curChunk = [];
     let idx = start;
     while (true) {
-        chunks.push(curChunk);
+        if (curChunk.length) {
+            chunks.push(curChunk);
+        }
         curChunk = [];
         for (let i = 0; i < size; i++) {
             if (idx + i >= this.length) {
-                chunks.shift();
+                if (curChunk.length) {
+                    chunks.push(curChunk);
+                }
                 return chunks;
             }
             curChunk.push(this[idx + i]);
