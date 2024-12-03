@@ -62,6 +62,13 @@ Array.prototype.groupBy = function<T>(keyfn: (t: T) => string) {
     return grouped;
 }
 
+Array.prototype.spliced = function(start: number, deleteCount = 0, ...toAddd) {
+    const copy = [...this];
+    copy.splice(start, deleteCount, ...toAddd);
+
+    return copy;
+}
+
 Object.prototype.mapValues = function<T, V>(mapper: (t: T) => V) {
     const newObject: Record<string, V> = {};
 
@@ -81,4 +88,13 @@ export const zip = <T, B>(listA: T[], listB: B[]) => {
     }
 
     return zipped;
+}
+
+export const range = (start: number, end: number, step = 1) => {
+    const res: number[] = [];
+    for (let i = start; i <= end; i += step) {
+        res.push(i);
+    }
+
+    return res;
 }

@@ -1,4 +1,4 @@
-import * as common from "./common.js";
+import "./common.js";
 
 const nums = "d1.txt".readNums();
 
@@ -7,4 +7,4 @@ const odds = nums.chunk(1, 1, 1).flat().groupBy((n) => n.toString()).mapValues(l
 
 const answer = evens.map(n => n * odds[n.toString()] || 0).sum();
 
-console.log({ answer, common });
+console.log({ answer });

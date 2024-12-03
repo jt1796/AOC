@@ -5,7 +5,8 @@
   "description": "",
   "main": "d1.js",
   "scripts": {
-    "day1": "tsc --project tsconfig.json && node dist/d1.js"
+    "day1": "tsc --project tsconfig.json && node dist/d1.js",
+    "day2": "tsc --project tsconfig.json && node dist/d2.js"
   },
   "author": "",
   "license": "ISC",

@@ -47,6 +47,11 @@ Array.prototype.groupBy = function (keyfn) {
     }
     return grouped;
 };
+Array.prototype.spliced = function (start, deleteCount = 0, ...toAddd) {
+    const copy = [...this];
+    copy.splice(start, deleteCount, ...toAddd);
+    return copy;
+};
 Object.prototype.mapValues = function (mapper) {
     const newObject = {};
     Object.entries(this).forEach(([k, v]) => newObject[k] = mapper(v));
@@ -62,4 +67,11 @@ export const zip = (listA, listB) => {
         ]);
     }
     return zipped;
+};
+export const range = (start, end, step = 1) => {
+    const res = [];
+    for (let i = start; i <= end; i += step) {
+        res.push(i);
+    }
+    return res;
 };
