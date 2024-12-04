@@ -16,4 +16,5 @@ interface Object {
 interface String {
     readNumsLines(): number[][];
     readNums(): number[]; 
+    readString(): string;
 }

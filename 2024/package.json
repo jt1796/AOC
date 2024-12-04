@@ -7,6 +7,7 @@
   "scripts": {
     "day1": "tsc --project tsconfig.json && node dist/d1.js",
     "day2": "tsc --project tsconfig.json && node dist/d2.js",
+    "day3": "tsc --project tsconfig.json && node dist/d3.js",
     "test": "tsc --project tsconfig.json && jest"
   },
   "author": "",

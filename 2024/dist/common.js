@@ -7,6 +7,10 @@ String.prototype.readNums = function () {
     const file = fs.readFileSync(this, { encoding: 'utf-8' }).toString();
     return file.split(/\s+/).map(Number);
 };
+String.prototype.readString = function () {
+    const file = fs.readFileSync(this, { encoding: 'utf-8' }).toString();
+    return file;
+};
 Array.prototype.chunk = function (size, skip = 0, start = 0) {
     const chunks = [];
     let curChunk = [];
@@ -81,4 +85,12 @@ export const range = (start, end, step = 1) => {
         res.push(i);
     }
     return res;
+};
+export const exhaust = (fn) => {
+    const results = [];
+    let result = undefined;
+    while (result = fn()) {
+        results.push(result);
+    }
+    return results;
 };

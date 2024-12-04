@@ -12,6 +12,12 @@ String.prototype.readNums = function() {
     return file.split(/\s+/).map(Number);
 }
 
+String.prototype.readString = function() {
+    const file = fs.readFileSync(this as string, { encoding: 'utf-8' }).toString();
+
+    return file;
+}
+
 Array.prototype.chunk = function<T>(size: number, skip = 0, start = 0) {
     const chunks: T[][] = [];
     let curChunk : T[] = [];
@@ -105,4 +111,14 @@ export const range = (start: number, end: number, step = 1) => {
     }
 
     return res;
+}
+
+export const exhaust = <T>(fn: () => T | undefined) => {
+    const results = [];
+    let result = undefined;
+    while (result = fn()) {
+        results.push(result);
+    }
+
+    return results;
 }
