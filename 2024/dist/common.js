@@ -1,4 +1,8 @@
 import * as fs from "fs";
+String.prototype.readStringGrid = function () {
+    const file = fs.readFileSync(this, { encoding: 'utf-8' }).toString();
+    return file.split(/[\r]?\n/g).map(s => s.split(""));
+};
 String.prototype.readNumsLines = function () {
     const file = fs.readFileSync(this, { encoding: 'utf-8' }).toString();
     return file.split(/[\r]?\n/g).map(s => s.split(/\s+/).map(Number));
@@ -68,6 +72,18 @@ Object.prototype.mapValues = function (mapper) {
 Array.prototype.range = function () {
     return range(0, this.length - 1);
 };
+String.prototype.print = function () {
+    console.log(this);
+    return this;
+};
+Number.prototype.print = function () {
+    console.log(this);
+    return this;
+};
+Array.prototype.print = function () {
+    console.table(this);
+    return this;
+};
 export const zip = (listA, listB) => {
     const minLength = Math.min(listA.length, listB.length);
     const zipped = [];
@@ -93,4 +109,13 @@ export const exhaust = (fn) => {
         results.push(result);
     }
     return results;
+};
+export const cross = (arrs) => {
+    if (arrs.length === 0)
+        return [];
+    if (arrs.length === 1)
+        return arrs[0].map(i => [i]);
+    const [head, ...tail] = arrs;
+    const recurse = cross(tail);
+    return head.flatMap(i => recurse.map(j => [i, ...j]));
 };

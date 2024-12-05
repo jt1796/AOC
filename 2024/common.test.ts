@@ -1,4 +1,4 @@
-import { range, zip } from "./common";
+import { cross, range, zip } from "./common";
 
 describe("zip", () => {
     it("zips", () => {
@@ -72,5 +72,39 @@ describe("Array", () => {
 
         const evenAligned = range(0, 8);
         expect(evenAligned.chunk(3)).toEqual([[0, 1, 2], [3, 4, 5], [6, 7, 8]]);
+    });
+});
+
+describe("cross", () => {
+    it("works with empty input", () => {
+        expect(cross([])).toEqual([]);
+        expect(cross([[]])).toEqual([]);
+        expect(cross([[], []])).toEqual([]);
+    });
+
+    it("works with one array", () => {
+        expect(cross([[1, 2, 3]])).toEqual([[1], [2], [3]]);
+    });
+
+    it("works with a pair of arrays", () => {
+        expect(cross([[1, 2], [3, 4]])).toEqual([
+            [1, 3],
+            [1, 4],
+            [2, 3],
+            [2, 4],
+        ]);
+    });
+
+    it("works with three arrays", () => {
+        expect(cross([[1, 2], [3, 4], [5, 6]])).toEqual([
+            [1, 3, 5],
+            [1, 3, 6],
+            [1, 4, 5],
+            [1, 4, 6],
+            [2, 3, 5],
+            [2, 3, 6],
+            [2, 4, 5],
+            [2, 4, 6],
+        ]);
     });
 });

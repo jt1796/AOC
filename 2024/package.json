@@ -5,9 +5,7 @@
   "description": "",
   "main": "d1.js",
   "scripts": {
-    "day1": "tsc --project tsconfig.json && node dist/d1.js",
-    "day2": "tsc --project tsconfig.json && node dist/d2.js",
-    "day3": "tsc --project tsconfig.json && node dist/d3.js",
+    "day": "tsc --project tsconfig.json && node dist/d$DAY.js",
     "test": "tsc --project tsconfig.json && jest"
   },
   "author": "",

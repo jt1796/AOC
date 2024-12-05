@@ -1,5 +1,11 @@
 import * as fs from "fs";
 
+String.prototype.readStringGrid = function() {
+    const file = fs.readFileSync(this as string, { encoding: 'utf-8' }).toString();
+
+    return file.split(/[\r]?\n/g).map(s => s.split(""));
+}
+
 String.prototype.readNumsLines = function() {
     const file = fs.readFileSync(this as string, { encoding: 'utf-8' }).toString();
 
@@ -91,6 +97,24 @@ Array.prototype.range = function() {
     return range(0, this.length - 1);
 }
 
+String.prototype.print = function() {
+    console.log(this);
+
+    return this;
+}
+
+Number.prototype.print = function() {
+    console.log(this);
+
+    return this;
+}
+
+Array.prototype.print = function() {
+    console.table(this);
+
+    return this;
+}
+
 export const zip = <T, B>(listA: T[], listB: B[]) => {
     const minLength = Math.min(listA.length, listB.length);
     const zipped: [T, B][] = [];
@@ -121,4 +145,14 @@ export const exhaust = <T>(fn: () => T | undefined) => {
     }
 
     return results;
+}
+
+export const cross = <T>(arrs: T[][]): T[][] => {
+    if (arrs.length === 0) return [];
+    if (arrs.length === 1) return arrs[0].map(i => [i]);
+
+    const [head, ...tail] = arrs;
+    const recurse = cross(tail);
+
+    return head.flatMap(i => recurse.map(j => [i, ...j]));
 }
