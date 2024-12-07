@@ -1,5 +1,4 @@
 import * as fs from "fs";
-import { toNamespacedPath } from "path";
 
 String.prototype.readStringGrid = function() {
     const file = fs.readFileSync(this as string, { encoding: 'utf-8' }).toString();
@@ -110,6 +109,47 @@ Array.prototype.spliced = function(start: number, deleteCount = 0, ...toAddd) {
     copy.splice(start, deleteCount, ...toAddd);
 
     return copy;
+}
+
+Array.prototype.printGrid = function() {
+    this.forEach((row) => {
+        row.join('').print();
+    });
+
+    return this;
+}
+
+Array.prototype.gridFind = function(x: any) {
+    for (let i = 0; i < this.length; i++) {
+        for (let j = 0; j < this[i].length; j++) {
+            if (this[i][j] === x) {
+                return [i, j];
+            }
+        }
+    }
+
+    return [-1, -1];
+}
+
+Array.prototype.gridIndex = function([x, y]) {
+    return this[x]?.[y];
+}
+
+Array.prototype.gridSet = function([x, y], val) {
+    if (x > 0 && y > 0 && x < this.length && y < this[x].length) {
+        this[x][y] = val;
+    }
+
+    return this;
+}
+
+Array.prototype.add = function<T>(arr: T[]) {
+    const newArr: T[] = [];
+    this.forEach((val, idx) => {
+        newArr[idx] = val + arr[idx];
+    });
+
+    return newArr;
 }
 
 Object.prototype.mapValues = function<T, V>(mapper: (t: T) => V) {

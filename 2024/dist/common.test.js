@@ -137,3 +137,29 @@ describe("graphs", () => {
         ]);
     });
 });
+describe("grid find", () => {
+    it("gives coordinates when found", () => {
+        const grid = `....#.....
+.........#
+..........
+..#.......
+.......#..
+..........
+.#..^.....
+........#.
+#.........
+......#...
+        `.lines().map(l => l.split(''));
+        expect(grid.gridFind('^')).toEqual([6, 4]);
+        expect(grid.gridFind('v')).toEqual([-1, -1]);
+        expect(grid.gridIndex([6, 4])).toEqual('^');
+    });
+});
+describe("list add", () => {
+    it("adds numbers", () => {
+        expect([1, 2, 3].add([4, 5, 6])).toEqual([5, 7, 9]);
+    });
+    it("adds strings", () => {
+        expect(["cat", "dog"].add([" foo", " bar"])).toEqual(["cat foo", "dog bar"]);
+    });
+});

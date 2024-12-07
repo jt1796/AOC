@@ -7,6 +7,11 @@ interface Array<T> {
     spliced(start: number, deleteCount = 0, ...toAdd: T[] = []): Array<T>;
     range(): number[];
     print(): Array<T>;
+    printGrid(): Array<T>;
+    gridFind(x: any): number[];
+    gridIndex(x: number[]): string;
+    gridSet(coords: number[], val: any): Array<T>;
+    add(arr: T[]): T[];
 }
 
 interface Object {
