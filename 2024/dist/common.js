@@ -15,6 +15,19 @@ String.prototype.readString = function () {
     const file = fs.readFileSync(this, { encoding: 'utf-8' }).toString();
     return file;
 };
+String.prototype.lines = function () {
+    return this.split(/[\r]?\n/g).map(l => l.trim());
+};
+String.prototype.getNums = function () {
+    const num = /\d+/g;
+    const str = this.toString();
+    return exhaust(() => num.exec(str)).map(s => +s);
+};
+String.prototype.getWords = function () {
+    const num = /\w+/g;
+    const str = this.toString();
+    return exhaust(() => num.exec(str)).map(s => s.toString());
+};
 Array.prototype.chunk = function (size, skip = 0, start = 0) {
     const chunks = [];
     let curChunk = [];
@@ -48,6 +61,13 @@ Array.prototype.sum = function () {
     }
     return accum;
 };
+Array.prototype.toMap = function () {
+    const accum = {};
+    for (let i = 0; i < this.length; i += 2) {
+        accum[this[i]] = this[i + 1];
+    }
+    return accum;
+};
 Array.prototype.groupBy = function (keyfn) {
     const grouped = {};
     for (let i = 0; i < this.length; i++) {
@@ -72,6 +92,10 @@ Object.prototype.mapValues = function (mapper) {
 Array.prototype.range = function () {
     return range(0, this.length - 1);
 };
+Object.prototype.print = function () {
+    console.log(this);
+    return this;
+};
 String.prototype.print = function () {
     console.log(this);
     return this;
@@ -81,7 +105,7 @@ Number.prototype.print = function () {
     return this;
 };
 Array.prototype.print = function () {
-    console.table(this);
+    console.log(this);
     return this;
 };
 export const zip = (listA, listB) => {
@@ -118,4 +142,22 @@ export const cross = (arrs) => {
     const [head, ...tail] = arrs;
     const recurse = cross(tail);
     return head.flatMap(i => recurse.map(j => [i, ...j]));
+};
+export const makeGraph = (edges) => {
+    const graph = {};
+    edges.forEach(([from, to]) => {
+        graph[from] = graph[from] || [];
+        graph[to] = graph[to] || [];
+        graph[from].push(to);
+    });
+    return graph;
+};
+export const search = (graph, start) => {
+    let frontier = [start];
+    const seen = new Set();
+    while (frontier.length) {
+        frontier.forEach(s => seen.add(s));
+        frontier = frontier.flatMap(v => graph[v]).filter(v => !seen.has(v));
+    }
+    return [...seen];
 };

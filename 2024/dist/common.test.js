@@ -1,4 +1,4 @@
-import { cross, range, zip } from "./common";
+import { cross, makeGraph, range, search, zip } from "./common";
 describe("zip", () => {
     it("zips", () => {
         const a = [1, 2, 3];
@@ -84,6 +84,56 @@ describe("cross", () => {
             [2, 3, 6],
             [2, 4, 5],
             [2, 4, 6],
+        ]);
+    });
+});
+describe("string lines", () => {
+    it("gets lines", () => {
+        const str = `hello
+        
+        there` + "\r\n" + "bye";
+        expect(str.lines()).toEqual(["hello", "", "there", "bye"]);
+    });
+});
+describe("string nums", () => {
+    it("gets nums", () => {
+        const str = `123
+        456 45
+        3,5|7`;
+        expect(str.getNums()).toEqual([123, 456, 45, 3, 5, 7]);
+    });
+});
+describe("string words", () => {
+    it("gets words", () => {
+        const str = `blah12
+        456 45
+        3,5|7`;
+        expect(str.getWords()).toEqual(["blah12", "456", "45", "3", "5", "7"]);
+    });
+});
+describe("graphs", () => {
+    it("makes them", () => {
+        const edges = [['1', '2'], ['1', '3'], ['3', '5'], ['10', '11']];
+        expect(makeGraph(edges)).toEqual({
+            "1": ["2", "3"],
+            "2": [],
+            "3": ["5"],
+            "5": [],
+            "10": ["11"],
+            "11": [],
+        });
+    });
+    it("searches them", () => {
+        const graph = makeGraph([
+            ['1', '2'],
+            ['2', '3'],
+            ['2', '4'],
+            ['4', '5'],
+            ['6', '7'],
+            ['7', '8'],
+        ]);
+        expect(search(graph, '1')).toEqual([
+            '1', '2', '3', '4', '5'
         ]);
     });
 });

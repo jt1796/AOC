@@ -19,6 +19,9 @@ interface String {
     readNumsLines(): number[][];
     readNums(): number[]; 
     readString(): string;
+    lines(): string[];
+    getNums(): number[];
+    getWords(): string[];
     readStringGrid(): string[][];
     print(): String;
 }
