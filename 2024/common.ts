@@ -9,7 +9,7 @@ String.prototype.readStringGrid = function() {
 String.prototype.readNumsLines = function() {
     const file = fs.readFileSync(this as string, { encoding: 'utf-8' }).toString();
 
-    return file.split(/[\r]?\n/g).map(s => s.split(/\s+/).map(Number));
+    return file.split(/[\r]?\n/g).map(s => s.getNums());
 }
 
 String.prototype.readNums = function() {

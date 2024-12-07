@@ -27,7 +27,6 @@ function checkLoop(x, y) {
     }
     const seen = new Set();
     while (grid.gridIndex(coords)) {
-        console.log;
         if (seen.has(coords.join(',') + dir)) {
             return true;
         }
