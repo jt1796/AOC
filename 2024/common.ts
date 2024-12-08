@@ -148,7 +148,7 @@ Array.prototype.gridIndex = function([x, y]) {
 }
 
 Array.prototype.gridSet = function([x, y], val) {
-    if (x > 0 && y > 0 && x < this.length && y < this[x].length) {
+    if (x >= 0 && y >= 0 && x < this.length && y < this[x].length) {
         this[x][y] = val;
     }
 
@@ -159,6 +159,15 @@ Array.prototype.add = function<T>(arr: T[]) {
     const newArr: T[] = [];
     this.forEach((val, idx) => {
         newArr[idx] = val + arr[idx];
+    });
+
+    return newArr;
+}
+
+Array.prototype.sub = function(arr: number[]) {
+    const newArr: number[] = [];
+    this.forEach((val, idx) => {
+        newArr[idx] = val - arr[idx];
     });
 
     return newArr;

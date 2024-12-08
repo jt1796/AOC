@@ -14,6 +14,7 @@ interface Array<T> {
     gridSet(coords: number[], val: any): Array<T>;
     gridSymbolMap(): Record<string, number[][]>;
     add(arr: T[]): T[];
+    sub(arr: T[]): T[];
 }
 
 interface Object {

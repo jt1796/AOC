@@ -116,7 +116,7 @@ Array.prototype.gridIndex = function ([x, y]) {
     return (_a = this[x]) === null || _a === void 0 ? void 0 : _a[y];
 };
 Array.prototype.gridSet = function ([x, y], val) {
-    if (x > 0 && y > 0 && x < this.length && y < this[x].length) {
+    if (x >= 0 && y >= 0 && x < this.length && y < this[x].length) {
         this[x][y] = val;
     }
     return this;
@@ -125,6 +125,13 @@ Array.prototype.add = function (arr) {
     const newArr = [];
     this.forEach((val, idx) => {
         newArr[idx] = val + arr[idx];
+    });
+    return newArr;
+};
+Array.prototype.sub = function (arr) {
+    const newArr = [];
+    this.forEach((val, idx) => {
+        newArr[idx] = val - arr[idx];
     });
     return newArr;
 };
