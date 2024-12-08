@@ -163,3 +163,28 @@ describe("list add", () => {
         expect(["cat", "dog"].add([" foo", " bar"])).toEqual(["cat foo", "dog bar"]);
     });
 });
+describe("grid symbol map", () => {
+    it("maps symbols to coordinates", () => {
+        const grid = `...
+.%.
+a..`.lines().map(l => l.split(''));
+        expect(grid.gridSymbolMap()).toEqual({
+            '.': [[0, 0], [0, 1], [0, 2], [1, 0], [1, 2], [2, 1], [2, 2]],
+            '%': [[1, 1]],
+            'a': [[2, 0]],
+        });
+    });
+});
+describe("array pairs", () => {
+    it("pairs", () => {
+        const a = [1, 2, 3];
+        expect(a.pairs()).toEqual([
+            [1, 2],
+            [1, 3],
+            [2, 1],
+            [2, 3],
+            [3, 1],
+            [3, 2],
+        ]);
+    });
+});

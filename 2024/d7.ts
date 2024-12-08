@@ -2,13 +2,13 @@ import "./common.js";
 
 const lines = "d7.txt".readNumsLines();
 
-const check = (target: number, accum: number, nums: number[]): boolean => {
+const check = (target: number, accum: number, nums: number[]): number => {
     if (!nums.length) {
-        return target === accum;
+        return target === accum ? target : 0;
     }
 
     if (accum > target) {
-        return false;
+        return 0;
     }
 
     const [next, ...rem] = nums;
@@ -18,8 +18,4 @@ const check = (target: number, accum: number, nums: number[]): boolean => {
         || check(target, +(accum.toString() + next.toString()), rem);
 };
 
-lines.map(([res, ...nums]) => {
-    const valid = check(res, 0, nums);
-
-    return valid ? res : 0;
-}).sum().print();
+lines.map(([res, ...nums]) => check(res, 0, nums)).sum().print();

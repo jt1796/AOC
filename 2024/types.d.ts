@@ -6,11 +6,13 @@ interface Array<T> {
     groupBy(keyfn: (t: T) => string): Record<string, T[]>;
     spliced(start: number, deleteCount = 0, ...toAdd: T[] = []): Array<T>;
     range(): number[];
+    pairs(): T[][];
     print(): Array<T>;
     printGrid(): Array<T>;
     gridFind(x: any): number[];
     gridIndex(x: number[]): string;
     gridSet(coords: number[], val: any): Array<T>;
+    gridSymbolMap(): Record<string, number[][]>;
     add(arr: T[]): T[];
 }
 

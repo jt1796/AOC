@@ -40,7 +40,6 @@ String.prototype.getWords = function() {
     return exhaust(() => num.exec(str)).map(s => s.toString());
 }
 
-
 Array.prototype.chunk = function<T>(size: number, skip = 0, start = 0) {
     const chunks: T[][] = [];
     let curChunk : T[] = [];
@@ -131,6 +130,19 @@ Array.prototype.gridFind = function(x: any) {
     return [-1, -1];
 }
 
+Array.prototype.gridSymbolMap = function() {
+    const res: Record<string, number[][]> = {};
+    for (let i = 0; i < this.length; i++) {
+        for (let j = 0; j < this[i].length; j++) {
+            const symbol = this[i][j];
+            res[symbol] = res[symbol] || [];
+            res[symbol].push([i, j]);
+        }
+    }
+
+    return res;
+}
+
 Array.prototype.gridIndex = function([x, y]) {
     return this[x]?.[y];
 }
@@ -158,6 +170,20 @@ Object.prototype.mapValues = function<T, V>(mapper: (t: T) => V) {
     Object.entries(this).forEach(([k, v]) => newObject[k] = mapper(v));
 
     return newObject;
+}
+
+Array.prototype.pairs = function<T>() {
+    const pairs: T[][] = [];
+
+    for (let i = 0; i < this.length; i++) {
+        for (let j = 0; j < this.length; j++) {
+            if (i !== j) {
+                pairs.push([this[i], this[j]]);
+            }
+        }
+    }
+
+    return pairs;
 }
 
 Array.prototype.range = function() {

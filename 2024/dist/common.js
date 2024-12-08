@@ -100,6 +100,17 @@ Array.prototype.gridFind = function (x) {
     }
     return [-1, -1];
 };
+Array.prototype.gridSymbolMap = function () {
+    const res = {};
+    for (let i = 0; i < this.length; i++) {
+        for (let j = 0; j < this[i].length; j++) {
+            const symbol = this[i][j];
+            res[symbol] = res[symbol] || [];
+            res[symbol].push([i, j]);
+        }
+    }
+    return res;
+};
 Array.prototype.gridIndex = function ([x, y]) {
     var _a;
     return (_a = this[x]) === null || _a === void 0 ? void 0 : _a[y];
@@ -121,6 +132,17 @@ Object.prototype.mapValues = function (mapper) {
     const newObject = {};
     Object.entries(this).forEach(([k, v]) => newObject[k] = mapper(v));
     return newObject;
+};
+Array.prototype.pairs = function () {
+    const pairs = [];
+    for (let i = 0; i < this.length; i++) {
+        for (let j = 0; j < this.length; j++) {
+            if (i !== j) {
+                pairs.push([this[i], this[j]]);
+            }
+        }
+    }
+    return pairs;
 };
 Array.prototype.range = function () {
     return range(0, this.length - 1);
