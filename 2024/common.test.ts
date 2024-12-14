@@ -16,6 +16,12 @@ describe("range", () => {
 
         expect(result).toEqual([1, 3, 5, 7]);
     });
+
+    it("ranges negative", () => {
+        const result = range(10, 4, 2);
+
+        expect(result).toEqual([10, 8, 6, 4]);
+    });
 });
 
 describe("Object", () => {

@@ -7,7 +7,7 @@ delete symbolMap['.'];
 const notUnique = Object.entries(symbolMap).flatMap(([symbol, locs]) => 
     locs.pairs().flatMap(([p1, p2]) => {
         const diff = p2.sub(p1);
-        return range(-1000, 1000).flatMap(m => {
+        return range(-20, 20).flatMap(m => {
             const newDiff = [diff[0] * m, diff[1] * m];
             return [p1.sub(newDiff), p2.add(newDiff)];
         });

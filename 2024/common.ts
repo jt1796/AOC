@@ -217,6 +217,12 @@ Number.prototype.print = function() {
     return this;
 }
 
+Number.prototype.times = function(fn: (i: number) => void) {
+    for (const i of range(0, +this - 1)) {
+        fn(i);
+    }
+}
+
 Array.prototype.print = function() {
     console.log(this);
 
@@ -238,9 +244,16 @@ export const zip = <T, B>(listA: T[], listB: B[]) => {
 
 export const range = (start: number, end: number, step = 1) => {
     const res: number[] = [];
-    for (let i = start; i <= end; i += step) {
-        res.push(i);
+    if (end > start) {
+        for (let i = start; i <= end; i += step) {
+            res.push(i);
+        }
+    } else {
+        for (let i = start; i >= end; i += -step) {
+            res.push(i);
+        }
     }
+
 
     return res;
 }

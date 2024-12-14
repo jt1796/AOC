@@ -166,6 +166,11 @@ Number.prototype.print = function () {
     console.log(this);
     return this;
 };
+Number.prototype.times = function (fn) {
+    for (const i of range(0, +this - 1)) {
+        fn(i);
+    }
+};
 Array.prototype.print = function () {
     console.log(this);
     return this;
@@ -183,8 +188,15 @@ export const zip = (listA, listB) => {
 };
 export const range = (start, end, step = 1) => {
     const res = [];
-    for (let i = start; i <= end; i += step) {
-        res.push(i);
+    if (end > start) {
+        for (let i = start; i <= end; i += step) {
+            res.push(i);
+        }
+    }
+    else {
+        for (let i = start; i >= end; i += -step) {
+            res.push(i);
+        }
     }
     return res;
 };
