@@ -325,3 +325,20 @@ export const flipflop = <T>(arr: T[], pred: (t: T) => boolean) => {
 
     return indices;
 }
+
+export const memo = <T extends Function>(fn: T): T => {
+    const cache: any = {};
+
+    const fn2: any = (...args: any[]) => {
+        const cacheKey = JSON.stringify(args);
+        if (cache[cacheKey]) {
+            return cache[cacheKey];
+        }
+
+        cache[cacheKey] = fn(...args);
+
+        return cache[cacheKey];
+    };
+
+    return fn2;
+};
