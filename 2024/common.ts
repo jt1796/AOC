@@ -199,6 +199,13 @@ Array.prototype.range = function() {
     return range(0, this.length - 1);
 }
 
+Array.prototype.unique = function<T>() {
+    const set = new Set<T>();
+    this.forEach(v => set.add(v));
+
+    return [...set];
+}
+
 Object.prototype.print = function() {
     console.log(this);
 
@@ -299,4 +306,22 @@ export const search = (graph: Record<string, string[]>, start: string) => {
     }
 
     return [...seen];
+}
+
+export const flipflop = <T>(arr: T[], pred: (t: T) => boolean) => {
+    let on = false;
+    const indices: number[] = [];
+    arr.forEach((e, idx) => {
+        const now = pred(e);
+        if (on !== now) {
+            indices.push(idx);
+        }
+        on = now;
+    });
+
+    if (on) {
+        indices.push(arr.length);
+    }
+
+    return indices;
 }

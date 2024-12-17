@@ -15,6 +15,7 @@ interface Array<T> {
     gridSymbolMap(): Record<string, number[][]>;
     add(arr: T[]): T[];
     sub(arr: T[]): T[];
+    unique(): T[];
 }
 
 interface Object {

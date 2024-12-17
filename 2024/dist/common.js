@@ -154,6 +154,11 @@ Array.prototype.pairs = function () {
 Array.prototype.range = function () {
     return range(0, this.length - 1);
 };
+Array.prototype.unique = function () {
+    const set = new Set();
+    this.forEach(v => set.add(v));
+    return [...set];
+};
 Object.prototype.print = function () {
     console.log(this);
     return this;
@@ -234,4 +239,19 @@ export const search = (graph, start) => {
         frontier = frontier.flatMap(v => graph[v]).filter(v => !seen.has(v));
     }
     return [...seen];
+};
+export const flipflop = (arr, pred) => {
+    let on = false;
+    const indices = [];
+    arr.forEach((e, idx) => {
+        const now = pred(e);
+        if (on !== now) {
+            indices.push(idx);
+        }
+        on = now;
+    });
+    if (on) {
+        indices.push(arr.length);
+    }
+    return indices;
 };

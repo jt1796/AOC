@@ -1,4 +1,4 @@
-import { cross, makeGraph, range, search, zip } from "./common";
+import { cross, flipflop, makeGraph, range, search, zip } from "./common";
 
 describe("zip", () => {
     it("zips", () => {
@@ -230,5 +230,21 @@ describe("array pairs", () => {
             [3, 1],
             [3, 2],
         ]);
+    });
+});
+
+describe("flipflow", () => {
+    it("alternates when initially false", () => {
+        const arr = [1, 1, -1, -1, 2, 2, -1];
+        const res = flipflop(arr, (e) => e === -1);
+
+        expect(res).toEqual([2, 4, 6, 7]);
+    });
+
+    it("alternates when initially true", () => {
+        const arr = [1, 1, -1, -1, 2, 2, -1];
+        const res = flipflop(arr, (e) => e !== -1);
+
+        expect(res).toEqual([0, 2, 4, 6]);
     });
 });
