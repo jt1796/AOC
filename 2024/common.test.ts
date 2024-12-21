@@ -194,6 +194,26 @@ describe("grid find", () => {
     });
 });
 
+describe("grid  neighbors", () => {
+    it("gives neighbors", () => {
+        const grid = `123
+456
+789`.lines().map(l => l.split(''));
+    
+            expect(grid.gridNeighbors([1, 1])).toEqual([
+                "6", "8", "4", "2"
+            ]);
+            
+            expect(grid.gridNeighbors([0, 0])).toEqual([
+                "2", "4", undefined, undefined
+            ]);
+
+            expect(grid.gridNeighbors([2, 2])).toEqual([
+                undefined, undefined, "8", "6"
+            ]);
+        });
+});
+
 describe("list add", () => {
     it("adds numbers", () => {
         expect([1, 2, 3].add([4, 5, 6])).toEqual([5, 7, 9]);
@@ -233,7 +253,7 @@ describe("array pairs", () => {
     });
 });
 
-describe("flipflow", () => {
+describe("flipflop", () => {
     it("alternates when initially false", () => {
         const arr = [1, 1, -1, -1, 2, 2, -1];
         const res = flipflop(arr, (e) => e === -1);

@@ -118,6 +118,21 @@ Array.prototype.printGrid = function() {
     return this;
 }
 
+Array.prototype.gridNeighbors = function([x, y]) {
+    const neighbors = [];
+    const dirs = [[0, 1], [1, 0], [0, -1], [-1, 0]];
+    for (const [dx, dy] of dirs) {
+        const [nx, ny] = [x + dx, y + dy];
+        if (nx >= 0 && ny >= 0 && nx < this.length && ny < this[nx].length) {
+            neighbors.push(this.gridIndex([nx, ny]));
+        } else {
+            neighbors.push(undefined);
+        }
+    }
+
+    return neighbors;
+}
+
 Array.prototype.gridFind = function(x: any) {
     for (let i = 0; i < this.length; i++) {
         for (let j = 0; j < this[i].length; j++) {

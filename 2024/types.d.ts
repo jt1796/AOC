@@ -13,6 +13,8 @@ interface Array<T> {
     gridIndex(x: number[]): string;
     gridSet(coords: number[], val: any): Array<T>;
     gridSymbolMap(): Record<string, number[][]>;
+    gridNeighbors(coords: number[]): any[];
+    gridDFS(start: number[], fn: (now: any, later: any) => boolean): number[][];
     add(arr: T[]): T[];
     sub(arr: T[]): T[];
     unique(): T[];
