@@ -1,5 +1,7 @@
 import "./common.js";
 
+import { MinPriorityQueue } from "@datastructures-js/priority-queue";
+
 const keypad = [
     ['7', '8', '9'],
     ['4', '5', '6'],
@@ -97,14 +99,10 @@ class Layer {
     }
 }
 
-const bottomLayer = new Layer(keypad, 2, 3, '', 0, undefined);
-// let middleLayer = bottomLayer;
-// (2).times(() => {
-//     middleLayer
-// });
-const middleLayer1 = new Layer(controlPad, 2, 0, '', 0, bottomLayer);
-const middleLayer2 = new Layer(controlPad, 2, 0, '', 0, middleLayer1);
-const topLayer = new Layer(controlPad, 2, 0, '', 0, middleLayer2);
+let topLayer = new Layer(keypad, 2, 3, '', 0, undefined);
+(3).times(() => {
+    topLayer = new Layer(controlPad, 2, 0, '', 0, topLayer);
+});
 
 const possibleMoves = [
     [1, 0],
@@ -114,12 +112,12 @@ const possibleMoves = [
     [2, 1],
 ];
 
-
 const calcForCode = (code: string) => {
     const cacheMap = new Map<string, number>();
-    const frontier = [topLayer];
-    while (frontier.length) {
-        const current = frontier.shift()!;
+    const frontier = new MinPriorityQueue<Layer>((a) => a.clicks);
+    frontier.enqueue(topLayer.clone());
+    while (frontier.size() > 0) {
+        const current = frontier.dequeue()!;
     
         if (cacheMap.has(current.getStateString()) && cacheMap.get(current.getStateString())! <= current.clicks) {
             continue;
@@ -129,6 +127,10 @@ const calcForCode = (code: string) => {
     
         if (!code.startsWith(current.getButtonsPressed())) {
             continue;
+        }
+
+        if (code === current.getButtonsPressed()) {
+            break;
         }
     
         for (const move of possibleMoves) {
@@ -151,11 +153,4 @@ const calcForCode = (code: string) => {
 
 const codesFromFile = "d21.txt".readString().lines();
 
-const codes = ["029A", "980A", "179A", "456A", "379A"];
-
-console.log({ codesFromFile });
 codesFromFile.map(code => calcForCode(code)).sum().print();
-
-
-// 25 intermediate robots
-// correct 278568
