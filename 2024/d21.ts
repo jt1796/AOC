@@ -61,21 +61,33 @@ function replaceWithPresses(code: string, bestPaths: Map<string, string[]>) {
     const input = code.split('').chunk(2, -1)
         .filter(l => l.length === 2)
         .map(([from, to]) => `${from} to ${to}`);
+
     return input.map(i => bestPaths.get(i)!);
 }
 
-function scoreWithCode(code: string) {
-    let input = replaceWithPresses(code, humanKeypadBestPaths);
-    2..times(() => {
-        input = input.map(seq => 
-            seq.flatMap(s => cross(replaceWithPresses(s, robotKeypadBestPaths))).map(a => a.join(''))
-        );
-    });
-    
-    const length = Object.values(input).map(l => l.map(l => l.length).sortAsNums()[0]).sum();
-    const codeNum = +code.replace('A', '');
+function recursiveScoreWithCode(code: string, level: number) {
+    if (level === 0) {
+        return code.length;
+    }
 
-    return length * codeNum;
+    const keypad = code.match(/[0-9]/) 
+        ? humanKeypadBestPaths
+        : robotKeypadBestPaths;
+
+    const scored = replaceWithPresses(code, keypad);
+
+    let totalScore = 0;
+    for (const seq of scored) {
+        let min = Infinity;
+        for (const s of seq) {
+            min = Math.min(min, recursiveScoreWithCode(s, level - 1));
+        }
+        totalScore += min;
+    }
+
+    return code.match(/[0-9]/)
+        ? totalScore * +code.replace('A', '')
+        : totalScore;
 }
 
-"d21.txt".readString().lines().map(l => scoreWithCode(l)).sum().print();
+"d21.txt".readString().lines().map(l => recursiveScoreWithCode(l, 3)).sum().print();
