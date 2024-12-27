@@ -1,4 +1,4 @@
-import { cross } from "./common.js";
+import { cross, memo } from "./common.js";
 
 const humanKeypad = [
     ['7', '8', '9'],
@@ -65,7 +65,7 @@ function replaceWithPresses(code: string, bestPaths: Map<string, string[]>) {
     return input.map(i => bestPaths.get(i)!);
 }
 
-function recursiveScoreWithCode(code: string, level: number) {
+const recursiveScoreWithCode = memo((code: string, level: number) => {
     if (level === 0) {
         return code.length;
     }
@@ -88,6 +88,6 @@ function recursiveScoreWithCode(code: string, level: number) {
     return code.match(/[0-9]/)
         ? totalScore * +code.replace('A', '')
         : totalScore;
-}
+});
 
-"d21.txt".readString().lines().map(l => recursiveScoreWithCode(l, 3)).sum().print();
+"d21.txt".readString().lines().map(l => recursiveScoreWithCode(l, 26)).sum().print();
