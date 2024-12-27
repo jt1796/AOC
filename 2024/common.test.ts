@@ -268,3 +268,26 @@ describe("flipflop", () => {
         expect(res).toEqual([0, 2, 4, 6]);
     });
 });
+
+describe("times", () => {
+    it("calls the function the right number of times", () => {
+        const fn = jest.fn();
+        5..times(fn);
+
+        expect(fn).toHaveBeenCalledTimes(5);
+    });
+
+    it("calls the function the right number of times", () => {
+        const fn = jest.fn();
+        (-5).times(fn);
+
+        expect(fn).toHaveBeenCalledTimes(5);
+    });
+
+    it("calls the function the right number of times", () => {
+        const fn = jest.fn();
+        0..times(fn);
+
+        expect(fn).toHaveBeenCalledTimes(0);
+    });
+});

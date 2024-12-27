@@ -1,156 +1,81 @@
-import "./common.js";
+import { cross } from "./common.js";
 
-import { MinPriorityQueue } from "@datastructures-js/priority-queue";
-
-const keypad = [
+const humanKeypad = [
     ['7', '8', '9'],
     ['4', '5', '6'],
     ['1', '2', '3'],
     ['', '0', 'A'],
 ];
 
-const controlPad = [
+const robotKeypad = [
     ['', '^', 'A'],
     ['<', 'v', '>'],
 ];
 
-class Layer {
-    x: number;
-    y: number;
-    pad: string[][];
-    lowerLayer?: Layer;
-    buttonsPressed: string;
-    clicks: number;
-
-    constructor(pad: string[][], x: number, y: number, buttonsPressed: string, clicks: number, lowerLayer?: Layer) {
-        this.pad = pad;
-        this.x = x;
-        this.y = y;
-        this.lowerLayer = lowerLayer;
-        this.buttonsPressed = buttonsPressed;
-        this.clicks = clicks;
-    }
-
-    getButtonsPressed(): string {
-        if (this.lowerLayer) {
-            return this.lowerLayer.getButtonsPressed();
-        }
-        return this.buttonsPressed;
-    }
-
-    check() {
-        if (!this.pad[this.y]?.[this.x]) {
-            throw new Error('out of bounds');
-        }
-        if (this.lowerLayer) {
-            this.lowerLayer.check();
-        }
-    }
-
-    clone(): Layer {
-        if (!this.lowerLayer) {
-            return new Layer(this.pad, this.x, this.y, this.buttonsPressed, this.clicks);
-        }
-        const clonedLowerLayer = this.lowerLayer.clone();
-        return new Layer(this.pad, this.x, this.y, this.buttonsPressed, this.clicks, clonedLowerLayer);
-    }
-
-    print() {
-        console.log(this.getStateString() + " -- " + this.clicks);
-    }
-
-    press(): Layer {
-        this.clicks++;
-        const button = this.pad[this.y]?.[this.x];
-        if (!this.lowerLayer) {
-            this.buttonsPressed = this.buttonsPressed + button;
-            return this;
-        }
-        if (button === 'A') {
-            this.lowerLayer.press();
-        }
-        if (button === '<') {
-            this.lowerLayer.x--;
-        }
-        if (button === '>') {
-            this.lowerLayer.x++;
-        }
-        if (button === '^') {
-            this.lowerLayer.y--;
-        }
-        if (button === 'v') {
-            this.lowerLayer.y++;
-        }
-
-        this.check();
-
-        return this;
-    }
-
-    getStateString() {
-        let base = '';
-        if (this.lowerLayer) {
-            base += this.lowerLayer.getStateString() + "/";
-        }
-
-        base += this.buttonsPressed + "_" + this.pad[this.y]?.[this.x];
-
-        return base;
-    }
-}
-
-let topLayer = new Layer(keypad, 2, 3, '', 0, undefined);
-(3).times(() => {
-    topLayer = new Layer(controlPad, 2, 0, '', 0, topLayer);
-});
-
-const possibleMoves = [
-    [1, 0],
-    [2, 0],
-    [0, 1],
-    [1, 1],
-    [2, 1],
-];
-
-const calcForCode = (code: string) => {
-    const cacheMap = new Map<string, number>();
-    const frontier = new MinPriorityQueue<Layer>((a) => a.clicks);
-    frontier.enqueue(topLayer.clone());
-    while (frontier.size() > 0) {
-        const current = frontier.dequeue()!;
+function computePathsForPad(keypad: string[][]) {
+    const keypadBestPaths = new Map<string, string[]>();
+    const keypadSymbolMap = keypad.gridSymbolMap();
+    const symbolsCrossed = cross([keypad.flat(), keypad.flat()]);
     
-        if (cacheMap.has(current.getStateString()) && cacheMap.get(current.getStateString())! <= current.clicks) {
-            continue;
-        } else {
-            cacheMap.set(current.getStateString(), current.clicks);
+    for (const [from, to] of symbolsCrossed) {
+        const fromCoords = keypadSymbolMap[from][0];
+        const toCoords = keypadSymbolMap[to][0];
+        const [yDiff, xDiff] = toCoords.sub(fromCoords);
+    
+        const key = from + " to " + to;
+        keypadBestPaths.set(key, []);
+    
+        const [toAvoidy, toAvoidx] = keypadSymbolMap[''][0];
+    
+        let pathA = '';
+    
+        if (toAvoidy !== fromCoords[0] || toAvoidx !== toCoords[1]) {
+            xDiff.times(() => pathA += xDiff > 0 ? '>' : '<');
+            yDiff.times(() => pathA += yDiff > 0 ? 'v' : '^');
+            pathA += 'A';
         }
     
-        if (!code.startsWith(current.getButtonsPressed())) {
-            continue;
+        let pathB = '';
+        if (toAvoidx !== fromCoords[1] || toAvoidy !== toCoords[0]) {
+            yDiff.times(() => pathB += yDiff > 0 ? 'v' : '^');
+            xDiff.times(() => pathB += xDiff > 0 ? '>' : '<');
+            pathB += 'A';
         }
-
-        if (code === current.getButtonsPressed()) {
-            break;
-        }
-    
-        for (const move of possibleMoves) {
-            const newLayer = current.clone();
-            newLayer.x = move[0];
-            newLayer.y = move[1];
-            try {
-                newLayer.press();
-                frontier.push(newLayer);
-            } catch (e) {}
-        }
-    }
-    const min = Math.min(...[...cacheMap.entries()]
-        .filter(([key]) => key.startsWith(code + "_"))
-        .map(([_, value]) => value));
-    const num = +(code.match(/\d+/g)?.join("")!);
         
-    return min * num;
+        if (pathA !== '') {
+            keypadBestPaths.get(key)?.push(pathA);
+        }
+        if (pathB !== '' && pathA !== pathB) {
+            keypadBestPaths.get(key)?.push(pathB);
+        }
+    }
+
+    return keypadBestPaths;
 }
 
-const codesFromFile = "d21.txt".readString().lines();
+const humanKeypadBestPaths = computePathsForPad(humanKeypad);
+const robotKeypadBestPaths = computePathsForPad(robotKeypad);
 
-codesFromFile.map(code => calcForCode(code)).sum().print();
+function replaceWithPresses(code: string, bestPaths: Map<string, string[]>) {
+    code = 'A' + code;
+    const input = code.split('').chunk(2, -1)
+        .filter(l => l.length === 2)
+        .map(([from, to]) => `${from} to ${to}`);
+    return input.map(i => bestPaths.get(i)!);
+}
+
+function scoreWithCode(code: string) {
+    let input = replaceWithPresses(code, humanKeypadBestPaths);
+    2..times(() => {
+        input = input.map(seq => 
+            seq.flatMap(s => cross(replaceWithPresses(s, robotKeypadBestPaths))).map(a => a.join(''))
+        );
+    });
+    
+    const length = Object.values(input).map(l => l.map(l => l.length).sortAsNums()[0]).sum();
+    const codeNum = +code.replace('A', '');
+
+    return length * codeNum;
+}
+
+"d21.txt".readString().lines().map(l => scoreWithCode(l)).sum().print();

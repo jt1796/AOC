@@ -240,7 +240,8 @@ Number.prototype.print = function() {
 }
 
 Number.prototype.times = function(fn: (i: number) => void) {
-    for (const i of range(0, +this - 1)) {
+    if (this === 0) return;
+    for (const i of range(0, +this - (+this > 0 ? 1 : -1))) {
         fn(i);
     }
 }
